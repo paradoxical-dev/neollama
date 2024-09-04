@@ -17,9 +17,51 @@ M.active_session = false
 M.active_session_shown = false
 
 M.plugin_dir = debug.getinfo(1, 'S').source:sub(2):match("(.*[/\\])")
-print(M.plugin_dir)
 
-M.setup = function ()
+M.default_config = {
+    api = {
+        model = 'llama3',
+        stream = false,
+        default_options = {
+
+        }
+    },
+    layout = {
+        automove_cursor = true,
+        border = 'rounded',
+        size = {
+            width = '70%',
+            height = '80%'
+        },
+        position = '50%',
+        title_hl = "String",
+        popup = {
+            header_style = "underline",
+            user_hl = "Normal",
+            model_hl = "Normal",
+            virtual_text = {"╒", "│", "╘"}
+        },
+        input = {
+            icon = ">",
+            text_hl = "Comment",
+        },
+        model_picker = {
+
+        },
+        session_picker = {
+
+        }
+    },
+    keymaps = {
+
+    }
+}
+
+M.setup = function (user_config)
+
+end
+
+M.initialize = function ()
     -- Opens session if one is available, remounting windows in their previous state
     if M.active_session and not M.active_session_shown then
         M.mode = M.utils.visual_selection()
@@ -103,7 +145,7 @@ M.setup = function ()
 
 end
 
-vim.keymap.set('n', '<leader>cc', "<cmd>lua require('neollama').setup()<CR>", {noremap = true})
-vim.keymap.set('v', '<leader>c', "<cmd>lua require('neollama').setup()<CR>", {noremap = true})
+vim.keymap.set('n', '<leader>cc', "<cmd>lua require('neollama').initialize()<CR>", {noremap = true})
+vim.keymap.set('v', '<leader>c', "<cmd>lua require('neollama').initialize()<CR>", {noremap = true})
 
 return M

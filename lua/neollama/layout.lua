@@ -408,7 +408,7 @@ M.session_picker = function ()
             on_submit = function (item)
                 local ok, _ = pcall(vim.api.nvim_set_current_win, M.window_selection[2])
                 if not ok then
-                    plugin.setup()
+                    plugin.initialize()
                     M.update_window_selection()
                 end
 
