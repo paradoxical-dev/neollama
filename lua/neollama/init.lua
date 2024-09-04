@@ -16,6 +16,9 @@ M.api.get_opts()
 M.active_session = false
 M.active_session_shown = false
 
+M.plugin_dir = debug.getinfo(1, 'S').source:sub(2):match("(.*[/\\])")
+print(M.plugin_dir)
+
 M.setup = function ()
     -- Opens session if one is available, remounting windows in their previous state
     if M.active_session and not M.active_session_shown then
@@ -35,9 +38,6 @@ M.setup = function ()
         print('Cannot start new session with active running session')
         return
     end
-
-    -- Capture initial window ID to allow hiding current session when switched back to
-    M.initial_window = vim.fn.win_getid()
 
     -- Capture current vim mode
     M.mode = M.utils.visual_selection()

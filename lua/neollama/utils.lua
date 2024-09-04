@@ -268,8 +268,9 @@ M.read_params = function ()
 end
 
 -- Writes the current session to the chat file followed by an empty string
+local chat_file = plugin.plugin_dir .. 'data/chats.lua'
 M.save_chat = function(name, value)
-    local file = io.open('chats.lua', 'a+')
+    local file = io.open(chat_file, 'a+')
     if file then
         file:write('local ' .. name .. ' = ' .. tostring(vim.inspect(value)))
         file:write('')
@@ -279,11 +280,9 @@ M.save_chat = function(name, value)
     end
 end
 
-M.plugin_dir = debug.getinfo(1).source:sub(2):match("(.*[/\\])")
-
 -- Reads chat file into string and queries based on the passed in session name
 M.load_chat = function(name)
-    local file = io.open('chats.lua', 'r')
+    local file = io.open(chat_file, 'r')
     if not file then
         print('Chat file not found')
         return nil
@@ -299,7 +298,7 @@ end
 
 -- Find-and-replace function for queries on the chats file
 M.overwrite_chat = function (target, repl_name,  repl)
-    local file = io.open('chats.lua', 'r')
+    local file = io.open(chat_file, 'r')
     if not file then
         print('Chat file not found')
         return nil
@@ -310,7 +309,7 @@ M.overwrite_chat = function (target, repl_name,  repl)
     local updated_content = content:gsub("local%s+" .. target .. "%s*=%s*(%b{})", 'local ' .. repl_name .. ' = ' .. tostring(vim.inspect(repl)))
     print(updated_content)
 
-    local replacement = io.open('chats.lua', 'w')
+    local replacement = io.open(chat_file, 'w')
     if not replacement then
         print('Chat file not found')
         return nil
@@ -320,8 +319,9 @@ M.overwrite_chat = function (target, repl_name,  repl)
 end
 
 -- Loads the undefined table in the user_data file as table to be defined and modified
+local user_file = plugin.plugin_dir .. 'data/user_data.json'
 M.chat_data = function ()
-    local file = io.open('user_data.json', 'r')
+    local file = io.open(user_file, 'r')
     if not file then
         print('User data file not found')
         return nil
@@ -334,11 +334,10 @@ M.chat_data = function ()
 
     return data
 end
-M.chat_data()
 
 -- Reloading the table and inserting it back into the file after modifications have been made
 M.update_data = function (data)
-    local file = io.open('user_data.json', 'w+')
+    local file = io.open(user_file, 'w+')
     if not file then
         print('User data file not found')
         return nil
