@@ -1,0 +1,5 @@
+{
+  "max_chats": 5,
+  "num_chats": 5,
+  "sessions": [ "science", "knock_knock", "OOP", "test", "meditations" ]
+}
