@@ -46,10 +46,12 @@ M.default_config = {
             text_hl = "Comment",
         },
         model_picker = {
-
+            icon = "",
+            hl = "Keyword"
         },
         session_picker = {
-
+            icon = "",
+            hl = "Keyword"
         }
     },
     keymaps = {
