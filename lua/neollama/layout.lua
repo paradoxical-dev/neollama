@@ -281,7 +281,7 @@ M.popup = function ()
         border = {
             style = 'rounded',
             text = {
-                top = ' ' .. _G.model .. ' ',
+                top = ' ' .. _G.NeollamaModel .. ' ',
                 top_align = 'center',
             },
             padding = {1, 1},
@@ -430,7 +430,7 @@ M.session_picker = function ()
                     API.params.stream = session_config.stream
                     API.params.opts = session_config.opts
                     API.params.model = session_config.model
-                    _G.model = session_config.model
+                    _G.NeollamaModel = session_config.model
 
                     utils.reformat_session(session_config.messages)
                 end, 0)
@@ -499,10 +499,10 @@ M.model_picker = function ()
             on_change = function(item, menu)
                 local nodes = menu.tree.nodes.by_id
                 for _, node in pairs(nodes) do
-                    node.text = node.text:gsub("^  ", "")
+                    node.text = node.text:gsub("^ " .. plugin.config.layout.model_picker_icon .. " ", "")
                     menu._tree:render()
                 end
-                item.text = "  " .. item.text
+                item.text = " " .. plugin.config.layout.model_picker_icon .. " " .. item.text
 
                 local menu_width = math.floor(plugin.layout._.float.container_info.size.width * 0.2)
                 if vim.fn.strdisplaywidth(item.text) >= menu_width then
@@ -516,7 +516,7 @@ M.model_picker = function ()
             on_submit = function (item)
                 vim.schedule(function()
                     if item.text:match('...') then
-                        local raw_name = item.text:gsub("^  ", "")
+                        local raw_name = item.text:gsub("^ " .. plugin.config.layout.model_picker_icon .. " ", "")
                         for _, value in ipairs(selections) do
                             if value:match(raw_name:gsub(1, -3)) then
                                 item.text = value
@@ -524,13 +524,13 @@ M.model_picker = function ()
                         end
                     end
 
-                    _G.model = item.text:gsub("^  ", "")
-                    API.params.model = _G.model
+                    _G.NeollamaModel= item.text:gsub("^ " .. plugin.config.layout.model_picker_icon .. " ", "")
+                    API.params.model = _G.NeollamaModel.
                     API.reset_opts()
 
                     API.model_loaded = false
                     API.model_opts = nil
-                    API.load_model(_G.model)
+                    API.load_model(_G.NeollamaModel)
                     API.get_opts()
 
                     M.remount()
@@ -552,7 +552,7 @@ M.param_viewer = function ()
         ns_id = 'neollama',
         zindex = 1,
         border = {
-            style = 'rounded',
+            style = plugin.config.layout.border,
             text = {
                 top = ' ' .. 'Config Editor' .. ' ',
                 top_align = 'center',
@@ -580,11 +580,8 @@ M.main_layout = function(p, i, menu1, menu2)
     if menu1 and menu2 then
         self.layout = Layout({
             relative = 'editor',
-            position = '50%',
-            size = {
-                width = '70%',
-                height = '80%'
-            },
+            position = plugin.config.layout.position,
+            size = plugin.config.layout.size,
         },
             Layout.Box({
                 Layout.Box({

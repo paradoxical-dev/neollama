@@ -18,6 +18,8 @@ M.set_utils = function (util)
     utils = util
 end
 
+_G.NeollamaModel = plugin.config.params.model
+
 --[[ Automatic values for all available default options
 does not include the current paramters of the loaded model by defualt ]]
 M.default_options = {
@@ -55,9 +57,9 @@ M.done = false
 M.model_loaded = false
 
 M.params = {
-    model = _G.model,
+    model = _G.NeollamaModel,
     messages = {},
-    stream = false,
+    stream = plugin.config.params.stream,
     opts = M.default_options,
 }
 
@@ -134,7 +136,7 @@ M.response_split = function(response)
     local sep = "\n"
     local open_block = false
     local t = {}
-    table.insert(t, _G.model .. ':')
+    table.insert(t, _G.NeollamaModel.. ':')
     table.insert(t,'')
     for str in string.gmatch(response, "([^"..sep.."]+)") do
         -- Checks for markdown header characters for section separation
@@ -199,7 +201,7 @@ M.load_model = function (model)
             if return_val == 0 then
                 M.model_loaded = true
             else
-                print('Error loading model: ' .. _G.model .. ' check your API connection and try again')
+                print('Error loading model: ' .. _G.NeollamaModel .. ' check your API connection and try again')
             end
         end)
     }):start()
@@ -249,7 +251,7 @@ end
 -- Grabs and recontructs the params of the current model into a lua table before updating the current opts using the `insert_model_opts` callback
 M.get_opts = function ()
     local port = 'http://localhost:11434/api/show'
-    local params = {name = _G.model}
+    local params = {name = _G.NeollamaModel}
     job:new({
         command = 'curl',
         args = {
@@ -382,8 +384,10 @@ M.ollamaCall = function()
                 M.constructed_response = M.constructed_response .. chunk
                 M.handle_stream(chunk)
 
-                vim.cmd('stopinsert')
-                vim.cmd('normal G$')
+                if plugin.config.autoscroll then
+                    vim.cmd('stopinsert')
+                    vim.cmd('normal G$')
+                end
             end
         end),
         on_stderr = function (err)

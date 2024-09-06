@@ -147,9 +147,9 @@ M.check_window = function ()
     end
 end
 
+-- Saves original cursor highlight group for reverting back after cursor is reshown
 M.og_cursor = nil
 M.og_cursor_hl = nil
---Saves original cursor highlight group for reverting back after cursor is reshown
 M.save_cursor = function ()
     if M.og_cursor_hl == nil then
         local t = {}
@@ -167,7 +167,7 @@ M.save_cursor = function ()
     end
 end
 
---Hides cursor when current window ID contains the `NeollamaLayoutMenu` window variable
+-- Hides cursor when current window ID contains the `NeollamaLayoutMenu` window variable
 M.hide_cursor = function ()
     M.save_cursor()
 

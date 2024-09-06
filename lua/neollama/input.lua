@@ -103,7 +103,7 @@ M.new = function ()
 
                     table.insert(LayoutHandler.window_selection, LayoutHandler.config_buf.winid)
                     utils.set_keymaps()
-                    vim.api.nvim_buf_set_name(LayoutHandler.config_buf.bufnr, 't.lua')
+                    vim.api.nvim_buf_set_name(LayoutHandler.config_buf.bufnr, 'neollama-config.lua')
 
                     local buf = LayoutHandler.config_buf.bufnr
                     local opts_str = vim.inspect(API.params.opts)
@@ -145,7 +145,7 @@ M.new = function ()
                     -- initiate empty response string for streamed responses and include empty lines to preserve separation
                     if API.params.stream then
                         local line_count = vim.api.nvim_buf_line_count(plugin.popup.bufnr)
-                        vim.api.nvim_buf_set_lines(plugin.popup.bufnr, line_count + 1, line_count + 1, false, {_G.model .. ':', "  ", "  "})
+                        vim.api.nvim_buf_set_lines(plugin.popup.bufnr, line_count + 1, line_count + 1, false, {_G.NeollamaModel .. ':', "  ", "  "})
 
                         API.constructed_response = ""
                     end

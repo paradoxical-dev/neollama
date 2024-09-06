@@ -18,16 +18,16 @@ M.active_session_shown = false
 
 M.plugin_dir = debug.getinfo(1, 'S').source:sub(2):match("(.*[/\\])")
 
-M.default_config = {
-    api = {
+M.config = {
+    autoscroll = true,
+    hide_cursor = true,
+    params = {
         model = 'llama3',
         stream = false,
-        default_options = {
-
-        }
+        default_options = M.api.default_options,
+        extra_opta = M.api.extra_opts
     },
     layout = {
-        automove_cursor = true,
         border = 'rounded',
         size = {
             width = '70%',
@@ -35,6 +35,7 @@ M.default_config = {
         },
         position = '50%',
         title_hl = "String",
+        border_hl = "FloatBorder",
         popup = {
             header_style = "underline",
             user_hl = "Normal",
@@ -55,16 +56,22 @@ M.default_config = {
         }
     },
     keymaps = {
-
+        toggle_layout = '<leader>ct',
+        window_next = '}',
+        window_prev = '{',
+        change_config = '<leader>cs'
     }
 }
 
 M.setup = function (user_config)
-
+    local config = vim.tbl_deep_extend('force', M.config, user_config)
+    M.api.default_options = config.params.default_options
+    M.api.extra_opts = config.params.extra_opts
+    M.config = config
 end
 
 M.initialize = function ()
-    -- Opens session if one is available, remounting windows in their previous state
+    -- Opens session if one is available; remounting windows in their previous state
     if M.active_session and not M.active_session_shown then
         M.mode = M.utils.visual_selection()
 
@@ -79,26 +86,19 @@ M.initialize = function ()
 
         return
     elseif M.active_session_shown and M.active_session then
-        print('Cannot start new session with active running session')
+        print('Unable to start new session with active running session')
         return
     end
 
     -- Capture current vim mode
     M.mode = M.utils.visual_selection()
 
-    M.api.params = {
-        model = _G.model,
-        messages = {},
-        stream = true,
-        opts = M.api.default_options
-    }
-
     -- Model list is updated each time session is created to ensure most up to date list, same is done with opts
     M.api.list_models()
     M.api.get_opts()
 
     -- Load model for quickest response time
-    M.api.load_model(_G.model)
+    M.api.load_model(_G.NeollamaModel)
 
     -- Initialize plugin windows and set internal mappings --
     vim.schedule(function()
@@ -108,12 +108,12 @@ M.initialize = function ()
         local i = M.Input.new()
         M.input = i.input
 
-        --Insert initial window IDs for navigation
-        M.Layout.update_window_selection()
-
         -- Initialize menu pickers for session layout
         M.model_picker = M.Layout.model_picker().menu
         M.session_picker = M.Layout.session_picker().menu
+
+        --Insert initial window IDs for navigation
+        M.Layout.update_window_selection()
 
         -- Check if local model list is available before initializing layout window
         if M.api.model_list == nil then
@@ -142,12 +142,11 @@ M.initialize = function ()
     end)
 
     vim.api.nvim_command("autocmd WinEnter * lua require('neollama.utils').check_window()")
-    vim.api.nvim_command("autocmd BufEnter * lua require('neollama.utils').hide_cursor()")
     vim.api.nvim_command("autocmd VimResized * lua require('neollama.layout').session_resize()")
+    if M.config.hide_cursor then
+        vim.api.nvim_command("autocmd BufEnter * lua require('neollama.utils').hide_cursor()")
+    end
 
 end
-
-vim.keymap.set('n', '<leader>cc', "<cmd>lua require('neollama').initialize()<CR>", {noremap = true})
-vim.keymap.set('v', '<leader>c', "<cmd>lua require('neollama').initialize()<CR>", {noremap = true})
 
 return M
