@@ -160,11 +160,11 @@ M.initialize = function ()
 
     end)
 
-    vim.api.nvim_command("autocmd WinEnter * lua require('neollama.utils').check_window()")
-    vim.api.nvim_command("autocmd VimResized * lua require('neollama.layout').session_resize()")
-    if M.config.hide_cursor then
-        vim.api.nvim_command("autocmd BufEnter * lua require('neollama.utils').hide_cursor()")
-    end
+    -- vim.api.nvim_command("autocmd WinEnter * lua require('neollama.utils').check_window()")
+    -- vim.api.nvim_command("autocmd VimResized * lua require('neollama.layout').session_resize()")
+    -- if M.config.hide_cursor then
+    --     vim.api.nvim_command("autocmd BufEnter * lua require('neollama.utils').hide_cursor()")
+    -- end
 
 end
 
