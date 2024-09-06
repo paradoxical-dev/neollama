@@ -71,7 +71,7 @@ M.new = function ()
             winhighlight = "Normal:Normal,FloatBorder:Normal",
         },
     }, {
-            prompt = "> ",
+            prompt = plugin.config.layout.input.icon .. " ",
             default_value = nil,
             on_close = function()
                 print("Input Closed!")

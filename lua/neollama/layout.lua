@@ -234,6 +234,8 @@ M.insert_input = function(popup,value)
     else
         vim.api.nvim_buf_set_lines(buf, current_lines + 1, -1, false, wrapped_lines)
     end
+
+    vim.cmd('stopinsert')
 end
 
 --[[ Awaits for `done` variable to be updated before updating
@@ -510,7 +512,7 @@ M.model_picker = function ()
                     end
 
                     _G.NeollamaModel= item.text:gsub("^ " .. plugin.config.layout.model_picker.icon .. " ", "")
-                    API.params.model = _G.NeollamaModel.
+                    API.params.model = _G.NeollamaModel
                     API.reset_opts()
 
                     API.model_loaded = false
