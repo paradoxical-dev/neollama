@@ -72,6 +72,7 @@ end
 
 -- Set plugin directory for acessing data files
 M.plugin_dir = debug.getinfo(1, 'S').source:sub(2):match("(.*[/\\])")
+print(M.plugin_dir)
 
 -- Initial model loading for quickest response time in default session
 M.api.list_models()

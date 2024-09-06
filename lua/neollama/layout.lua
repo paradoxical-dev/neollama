@@ -242,15 +242,16 @@ M.insert_response = function(popup,response)
     local res = API.response_split(response)
     local buf = popup.bufnr
     local current_lines = vim.api.nvim_buf_line_count(buf)
+    local config = plugin.config.layout.popup
 
     vim.api.nvim_buf_set_lines(buf, current_lines + 1, current_lines + 1, false, res)
     for i=current_lines + 2, vim.api.nvim_buf_line_count(buf) - 1 do
         if i == current_lines + 2 then
-            M.insert_vtext(buf, i, plugin.config.layout.popup.virt_text[1], "Keyword", "NeollamaChatVirtualText")
+            M.insert_vtext(buf, i, config.virtual_text[1], config.virtual_text_hl, "NeollamaChatVirtualText")
         elseif i == vim.api.nvim_buf_line_count(buf) - 1 then
-            M.insert_vtext(buf, i, plugin.config.layout.popup.virt_text[3], "Keyword", "NeollamaChatVirtualText")
+            M.insert_vtext(buf, i, config.virtual_text[3], config.virtual_text_hl, "NeollamaChatVirtualText")
         else
-            M.insert_vtext(buf, i, plugin.config.layout.popup.virt_text[2], "Keyword", "NeollamaChatVirtualText")
+            M.insert_vtext(buf, i, config.virtual_text[2], config.virtual_text_hl, "NeollamaChatVirtualText")
         end
     end
 end
@@ -342,6 +343,7 @@ M.session_picker = function ()
         utils.setTimeout(0.5, function ()
             print('Delayed start: user data')
             user_data = user_data
+            print(vim.inspect(user_data))
         end, function() return user_data end)
     end
 
@@ -482,10 +484,10 @@ M.model_picker = function ()
             on_change = function(item, menu)
                 local nodes = menu.tree.nodes.by_id
                 for _, node in pairs(nodes) do
-                    node.text = node.text:gsub("^ " .. plugin.config.layout.model_picker_icon .. " ", "")
+                    node.text = node.text:gsub("^ " .. plugin.config.layout.model_picker.icon .. " ", "")
                     menu._tree:render()
                 end
-                item.text = " " .. plugin.config.layout.model_picker_icon .. " " .. item.text
+                item.text = " " .. plugin.config.layout.model_picker.icon .. " " .. item.text
 
                 local menu_width = math.floor(plugin.layout._.float.container_info.size.width * 0.2)
                 if vim.fn.strdisplaywidth(item.text) >= menu_width then
@@ -499,7 +501,7 @@ M.model_picker = function ()
             on_submit = function (item)
                 vim.schedule(function()
                     if item.text:match('...') then
-                        local raw_name = item.text:gsub("^ " .. plugin.config.layout.model_picker_icon .. " ", "")
+                        local raw_name = item.text:gsub("^ " .. plugin.config.layout.model_picker.icon .. " ", "")
                         for _, value in ipairs(selections) do
                             if value:match(raw_name:gsub(1, -3)) then
                                 item.text = value
@@ -507,7 +509,7 @@ M.model_picker = function ()
                         end
                     end
 
-                    _G.NeollamaModel= item.text:gsub("^ " .. plugin.config.layout.model_picker_icon .. " ", "")
+                    _G.NeollamaModel= item.text:gsub("^ " .. plugin.config.layout.model_picker.icon .. " ", "")
                     API.params.model = _G.NeollamaModel.
                     API.reset_opts()
 
