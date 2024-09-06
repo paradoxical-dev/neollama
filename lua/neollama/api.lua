@@ -18,8 +18,6 @@ M.set_utils = function (util)
     utils = util
 end
 
-_G.NeollamaModel = plugin.config.params.model
-
 --[[ Automatic values for all available default options
 does not include the current paramters of the loaded model by defualt ]]
 M.default_options = {
