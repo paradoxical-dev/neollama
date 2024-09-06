@@ -54,12 +54,12 @@ M.extra_opts = {
 M.done = false
 M.model_loaded = false
 
-M.params = {
-    model = _G.NeollamaModel,
-    messages = {},
-    stream = plugin.config.params.stream,
-    opts = M.default_options,
-}
+-- M.params = {
+--     model = _G.NeollamaModel,
+--     messages = {},
+--     stream = plugin.config.params.stream,
+--     opts = M.default_options,
+-- }
 
 -- Default the response to an empty string for streamed responses
 M.constructed_response = ""

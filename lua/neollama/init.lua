@@ -93,6 +93,14 @@ M.initialize = function ()
         return
     end
 
+    -- Initialize empty chat history
+    M.api.params = {
+        model = M.config.params.model,
+        messages = {},
+        stream = M.config.params.stream,
+        opts = M.config.params.default_options
+    }
+
     -- Capture current vim mode
     M.mode = M.utils.visual_selection()
 
