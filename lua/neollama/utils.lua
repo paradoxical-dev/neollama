@@ -253,7 +253,6 @@ M.overwrite_chat = function (target, repl_name,  repl)
     local content = file:read("*all")
     file:close()
     local updated_content = content:gsub("local%s+" .. target .. "%s*=%s*(%b{})", 'local ' .. repl_name .. ' = ' .. tostring(vim.inspect(repl)))
-    print(updated_content)
 
     local replacement = io.open(chat_file, 'w')
     if not replacement then

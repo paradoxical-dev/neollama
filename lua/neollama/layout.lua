@@ -124,6 +124,8 @@ M.show_input = function ()
     if M.menu_shown then
         plugin.model_picker = M.model_picker().menu
         plugin.session_picker = M.session_picker().menu
+
+
         plugin.layout:update(
             Layout.Box({
                 Layout.Box({
@@ -345,7 +347,6 @@ M.session_picker = function ()
         utils.setTimeout(0.5, function ()
             print('Delayed start: user data')
             user_data = user_data
-            print(vim.inspect(user_data))
         end, function() return user_data end)
     end
 

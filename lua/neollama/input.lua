@@ -74,7 +74,6 @@ M.new = function ()
             prompt = plugin.config.layout.input.icon .. " ",
             default_value = nil,
             on_close = function()
-                print("Input Closed!")
             end,
             on_submit = function(value) -- Inserts user input accordingly while calling the ollama client with the user input
                 if value == "/s" then
@@ -131,7 +130,6 @@ M.new = function ()
                 -- check for visual mode; including the selection if necessary
                 table.insert(API.params.messages, #API.params.messages + 1, {role = "user", content = value})
                 if plugin.mode ~= false then
-                    print(plugin.mode)
                     API.params.messages[#API.params.messages].content = API.params.messages[#API.params.messages].content .. '\n' .. plugin.mode
                     plugin.mode = false
                 end

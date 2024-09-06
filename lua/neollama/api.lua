@@ -305,7 +305,6 @@ M.get_opts = function ()
                 ::continue::
             end
             M.model_opts = constructed_params
-            print(vim.inspect(M.model_opts))
 
             M.insert_model_opts(M.model_opts)
         end
