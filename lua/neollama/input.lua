@@ -1,5 +1,5 @@
 local Input = require('nui.input')
-local utils = require('lilcumstain.neollama.utils')
+local utils = require('neollama.utils')
 
 local M = {}
 
