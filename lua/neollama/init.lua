@@ -14,7 +14,7 @@ M.config = {
         model = 'llama3',
         stream = false,
         default_options = M.api.default_options,
-        extra_opta = M.api.extra_opts
+        extra_opts = M.api.extra_opts
     },
     layout = {
         border = 'rounded',
