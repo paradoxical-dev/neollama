@@ -58,6 +58,8 @@ M.setup = function (user_config)
     M.api.default_options = config.params.default_options
     M.api.extra_opts = config.params.extra_opts
     M.config = config
+
+    _G.NeollamaModel = config.params.model
 end
 
 -- Set plugin directory for acessing data files
