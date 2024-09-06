@@ -37,10 +37,10 @@ M.toggle_layout = function ()
     end
     if not M.menu_shown then
         plugin.layout:update({
-            position = "50%",
+            position = plugin.config.layout.position,
             size = {
-                width = resized_dimensions or "70%",
-                height = resized_dimensions or "80%"
+                width = resized_dimensions or plugin.config.layout.size.width,
+                height = resized_dimensions or plugin.config.layout.size.height
             }
         },
             Layout.Box({
@@ -59,10 +59,10 @@ M.toggle_layout = function ()
         return
     else
         plugin.layout:update({
-            position = "50%",
+            position = plugin.config.layout.position,
             size = {
-                width = resized_dimensions or "70%",
-                height = resized_dimensions or "80%"
+                width = resized_dimensions or plugin.config.layout.size.width,
+                height = resized_dimensions or plugin.config.layout.size.height
             }
         },
             Layout.Box({
@@ -87,11 +87,8 @@ M.hide_input = function ()
         plugin.session_picker = M.session_picker().menu
 
         plugin.layout:update({
-            position = "50%",
-            size = {
-                width = "70%",
-                height = "80%"
-            }
+            position = plugin.config.layout.position,
+            size = plugin.config.layout.size,
         },
             Layout.Box({
                 Layout.Box({
@@ -107,11 +104,8 @@ M.hide_input = function ()
         return
     else
         plugin.layout:update({
-            position = "50%",
-            size = {
-                width = "70%",
-                height = "80%"
-            }
+            position = plugin.config.layout.position,
+            size = plugin.config.layout.size,
         },
             Layout.Box({
                 Layout.Box({
@@ -165,7 +159,7 @@ M.window_selection = {}
 M.current_index = 2
 
 --[[ Delay window slection update until current working process has finished
-this is to avoid any overlapping process to interrupt the update process ]]
+to avoid any overlapping process to interrupt the update process ]]
 M.update_window_selection = vim.schedule_wrap(function (input_hidden)
     M.window_selection = {}
     table.insert(M.window_selection, plugin.popup.winid)
@@ -194,9 +188,8 @@ M.window_next = function ()
     end
 
     local ok, _ = pcall(vim.api.nvim_set_current_win, M.window_selection[M.current_index])
-    if not ok then
-        utils.setTimeout(0.05, function ()
-            print("she wasn't readyyy")
+    if not ok then -- Slight delay before recall loop using setTimeout
+        utils.setTimeout(0.1, function ()
         end, function() local res, _ = pcall(vim.api.nvim_set_current_win, M.window_selection[M.current_index]) return res end)
     end
 end
@@ -211,8 +204,7 @@ M.window_prev = function ()
 
     local ok, _ = pcall(vim.api.nvim_set_current_win, M.window_selection[M.current_index])
     if not ok then
-        utils.setTimeout(0.05, function ()
-            print("she wasn't readyyy")
+        utils.setTimeout(0.1, function ()
         end, function() local res, _ = pcall(vim.api.nvim_set_current_win, M.window_selection[M.current_index]) return res end)
     end
 end
@@ -225,7 +217,6 @@ M.insert_vtext = function (bufnr, linenr, text, hl_group, namespace)
         virt_text_pos = 'overlay',
     })
 end
-
 
 --[[ Append user input to popup buffer. At the top for
 initial input and seperated by exmpty line for any following input ]]
@@ -257,18 +248,18 @@ M.insert_response = function(popup,response)
     vim.api.nvim_buf_set_lines(buf, current_lines + 1, current_lines + 1, false, res)
     for i=current_lines + 2, vim.api.nvim_buf_line_count(buf) - 1 do
         if i == current_lines + 2 then
-            M.insert_vtext(buf, i, "╒", "Keyword", "NeollamaChatVirtualText")
+            M.insert_vtext(buf, i, plugin.config.layout.popup.virt_text[1], "Keyword", "NeollamaChatVirtualText")
         elseif i == vim.api.nvim_buf_line_count(buf) - 1 then
-            M.insert_vtext(buf, i, "╘", "Keyword", "NeollamaChatVirtualText")
+            M.insert_vtext(buf, i, plugin.config.layout.popup.virt_text[3], "Keyword", "NeollamaChatVirtualText")
         else
-            M.insert_vtext(buf, i, "│", "Keyword", "NeollamaChatVirtualText")
+            M.insert_vtext(buf, i, plugin.config.layout.popup.virt_text[2], "Keyword", "NeollamaChatVirtualText")
         end
     end
 end
 
 -- WINDOW CREATION --
 
--- Creates a new instance of popup buffer with predefined options
+-- Basic instance of popup window for chat history
 M.popup = function ()
     local self = {}
     setmetatable(self, {__index = M})
@@ -276,10 +267,8 @@ M.popup = function ()
         relative = 'editor',
         enter = true,
         focusable = true,
-        -- ns_id = 'neollama',
-        -- zindex = 1,
         border = {
-            style = 'rounded',
+            style = plugin.config.layout.border,
             text = {
                 top = ' ' .. _G.NeollamaModel .. ' ',
                 top_align = 'center',
@@ -311,7 +300,7 @@ M.overwrite_menu = function ()
     self.menu = Menu({
         relative = 'editor',
         border = {
-            style = 'rounded',
+            style = plugin.config.layout.border,
             text = {
                 top = "{ Model to Overwrite }",
                 top_align = 'center',
@@ -333,11 +322,8 @@ M.overwrite_menu = function ()
             },
             on_close = function ()
                 print('Overwrite cancelled')
-                plugin.input:show()
-                plugin.popup:show()
-                if M.menu_shown then
-                    plugin.layout:show()
-                end
+                plugin.layout:show()
+
                 utils.set_keymaps()
                 M.update_window_selection()
             end,
@@ -348,8 +334,7 @@ M.overwrite_menu = function ()
     return self
 end
 
---[[ Defines the session window for use in the settings layout
-used for selecting and loading previously saved models ]]
+-- Defines the session window used for selecting and loading previously saved models
 M.session_picker = function ()
     local self = {}
     setmetatable(self, {__index = M})
@@ -367,7 +352,7 @@ M.session_picker = function ()
         local t = {}
         for _, session in ipairs(user_data.sessions) do
             table.insert(selections, session)
-            table.insert(t, #t + 1, Menu.item(' ' .. session))
+            table.insert(t, #t + 1, Menu.item(plugin.config.layout.session_picker.icon .. ' ' .. session))
         end
         return t
     end
@@ -377,7 +362,7 @@ M.session_picker = function ()
         relative = 'editor',
         enter = false,
         border = {
-            style = 'rounded',
+            style = plugin.config.layout.border,
             text = {
                 top = "   Saved Sessions ",
                 top_align = 'center',
@@ -413,7 +398,7 @@ M.session_picker = function ()
                 end
 
                 vim.schedule(function()
-                    local new_session = item.text:gsub("^ ", "")
+                    local new_session = item.text:gsub("^" .. plugin.config.layout.session_picker.icon .. " ", "")
                     if item.text:match('...') then
                         for _, value in ipairs(selections) do
                             if value:match(new_session:gsub(1, -3)) then
@@ -472,7 +457,7 @@ M.model_picker = function ()
         relative = 'editor',
         enter = false,
         border = {
-            style = 'rounded',
+            style = plugin.config.layout.border,
             text = {
                 top = "   Model ",
                 top_align = 'center',
@@ -549,7 +534,6 @@ M.param_viewer = function ()
         relative = 'editor',
         enter = true,
         focusable = true,
-        ns_id = 'neollama',
         zindex = 1,
         border = {
             style = plugin.config.layout.border,
@@ -610,11 +594,8 @@ M.main_layout = function(p, i, menu1, menu2)
     else
         self.layout = Layout({
             relative = 'editor',
-            position = '50%',
-            size = {
-                width = '70%',
-                height = '80%'
-            },
+            position = plugin.config.layout.position,
+            size = plugin.config.layout.size,
         },
             Layout.Box({
                 Layout.Box({

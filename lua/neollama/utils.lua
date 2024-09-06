@@ -75,21 +75,16 @@ M.visual_selection = function()
     return selected_text
 end
 
-M.close_map = function ()
-    plugin.layout:unmount()
-    plugin.active_session_shown = false
-    plugin.active_session = false
-end
-
 -- Apply and remove keybindings used only from within the plugin --
+
 local group_name = 'Neollama'
 local augroup = vim.api.nvim_create_augroup(group_name, {})
 M.og_keymaps = {}
 M.internal_keymaps = {
-    { mode = 'n', lhs = '<leader>ct', rhs = "<cmd>lua require('lilcumstain.neollama.layout').toggle_layout()<CR>" },
-    { mode = 'n', lhs = '}', rhs = "<cmd>lua require('lilcumstain.neollama.layout').window_next()<CR>" },
-    { mode = 'n', lhs = '{', rhs = "<cmd>lua require('lilcumstain.neollama.layout').window_prev()<CR>" },
-    { mode = 'n', lhs = '<leader>cs', rhs = "<cmd>lua require('lilcumstain.neollama.utils').change_config(vim.api.nvim_get_current_buf())<CR>" },
+    { mode = 'n', lhs = plugin.config.keymaps.toggle_layout, rhs = "<cmd>lua require('lilcumstain.neollama.layout').toggle_layout()<CR>" },
+    { mode = 'n', lhs = plugin.config.keymaps.window_next, rhs = "<cmd>lua require('lilcumstain.neollama.layout').window_next()<CR>" },
+    { mode = 'n', lhs = plugin.config.keymaps.window_prev, rhs = "<cmd>lua require('lilcumstain.neollama.layout').window_prev()<CR>" },
+    { mode = 'n', lhs = plugin.config.keymaps.change_config, rhs = "<cmd>lua require('lilcumstain.neollama.utils').change_config(vim.api.nvim_get_current_buf())<CR>" },
     { mode = 'n', lhs = '<esc>', rhs = "<cmd>lua require('lilcumstain.neollama.utils').close_map()<CR>" },
 }
 
@@ -106,8 +101,10 @@ M.set_keymaps = function()
         end
         if keymap.rhs == "<cmd>lua require('lilcumstain.neollama.layout').window_next()<CR>" or keymap.rhs == "<cmd>lua require('lilcumstain.neollama.layout').window_prev()<CR>" then
             vim.api.nvim_set_keymap(keymap.mode, keymap.lhs, keymap.rhs, {noremap = true, silent = true, nowait = true})
+            goto continue
         end
         vim.api.nvim_set_keymap(keymap.mode, keymap.lhs, keymap.rhs, {noremap = true, silent = true})
+        ::continue::
     end
 end
 
@@ -147,63 +144,13 @@ M.check_window = function ()
     end
 end
 
--- Saves original cursor highlight group for reverting back after cursor is reshown
-M.og_cursor = nil
-M.og_cursor_hl = nil
-M.save_cursor = function ()
-    if M.og_cursor_hl == nil then
-        local t = {}
-        local hl = vim.api.nvim_exec("highlight Cursor", true)
-        for word in string.gmatch(hl, "%S+") do
-            table.insert(t, word)
-        end
-        local hl_string = t[3] .. ' ' .. t[4] .. ' blend=0'
-        if hl_string then
-            M.og_cursor_hl = hl_string
-        else
-            M.og_cursor_hl = ""
-        end
-        M.og_cursor = vim.o.guicursor
-    end
+M.close_map = function ()
+    plugin.layout:unmount()
+    plugin.active_session_shown = false
+    plugin.active_session = false
 end
 
--- Hides cursor when current window ID contains the `NeollamaLayoutMenu` window variable
-M.hide_cursor = function ()
-    M.save_cursor()
-
-    local winID = vim.api.nvim_get_current_win()
-
-    local is_menu = false
-    local status, res = pcall(vim.api.nvim_win_get_var, winID, "NeollamaLayoutMenu")
-    if status then
-        is_menu = res
-    end
-
-    if is_menu then
-        vim.cmd("set guicursor=a:Cursor/lCursor")
-        vim.cmd('highlight Cursor blend=100')
-    else
-        if M.og_cursor_hl and M.og_cursor_hl ~= "" then
-            vim.cmd('highlight Cursor ' .. M.og_cursor_hl)
-        end
-        vim.cmd("set guicursor=" .. M.og_cursor)
-    end
-end
-
--- Reformat loaded sessions to popup window
-M.reformat_session = function (messages)
-    vim.api.nvim_buf_set_lines(plugin.popup.bufnr, 0, -1, false, {}) -- clear current popup window
-
-    for _, message in ipairs(messages) do
-        if message.role ~= "user" and message.role ~= "system" and message.role ~= "tool" then
-            LayoutHandler.insert_response(plugin.popup, message.content)
-        elseif message.role == "user" then
-            LayoutHandler.insert_input(plugin.popup, message.content)
-        end
-    end
-
-    vim.cmd('normal! G')
-end
+-- CONFIG HANDLING --
 
 -- Format the recieved table string back to a lua table seperated by lines
 M.param_format = function (opts)
@@ -266,6 +213,8 @@ M.read_params = function ()
 
     return t
 end
+
+--  CHAT/USER DATA --
 
 -- Writes the current session to the chat file followed by an empty string
 local chat_file = plugin.plugin_dir .. 'data/chats.lua'
@@ -345,6 +294,8 @@ M.update_data = function (data)
     file:write(tostring(vim.inspect(vim.json.encode(data))))
 end
 
+-- TEXT/LAYOUT MANIPULATION --
+
 -- Custom line wrqp function to respect virtual text
 M.line_wrap = function (str, width)
     local t = {}
@@ -385,6 +336,64 @@ M.session_resize = function ()
 
         LayoutHandler.resized = false
     end
+end
+
+-- Saves original cursor highlight group for reverting back after cursor is reshown
+M.og_cursor = nil
+M.og_cursor_hl = nil
+M.save_cursor = function ()
+    if M.og_cursor_hl == nil then
+        local t = {}
+        local hl = vim.api.nvim_exec("highlight Cursor", true)
+        for word in string.gmatch(hl, "%S+") do
+            table.insert(t, word)
+        end
+        local hl_string = t[3] .. ' ' .. t[4] .. ' blend=0'
+        if hl_string then
+            M.og_cursor_hl = hl_string
+        else
+            M.og_cursor_hl = ""
+        end
+        M.og_cursor = vim.o.guicursor
+    end
+end
+
+-- Hides cursor when current window ID contains the `NeollamaLayoutMenu` window variable
+M.hide_cursor = function ()
+    M.save_cursor()
+
+    local winID = vim.api.nvim_get_current_win()
+
+    local is_menu = false
+    local status, res = pcall(vim.api.nvim_win_get_var, winID, "NeollamaLayoutMenu")
+    if status then
+        is_menu = res
+    end
+
+    if is_menu then
+        vim.cmd("set guicursor=a:Cursor/lCursor")
+        vim.cmd('highlight Cursor blend=100')
+    else
+        if M.og_cursor_hl and M.og_cursor_hl ~= "" then
+            vim.cmd('highlight Cursor ' .. M.og_cursor_hl)
+        end
+        vim.cmd("set guicursor=" .. M.og_cursor)
+    end
+end
+
+-- Reformat loaded sessions to popup window
+M.reformat_session = function (messages)
+    vim.api.nvim_buf_set_lines(plugin.popup.bufnr, 0, -1, false, {}) -- clear current popup window
+
+    for _, message in ipairs(messages) do
+        if message.role ~= "user" and message.role ~= "system" and message.role ~= "tool" then
+            LayoutHandler.insert_response(plugin.popup, message.content)
+        elseif message.role == "user" then
+            LayoutHandler.insert_input(plugin.popup, message.content)
+        end
+    end
+
+    vim.cmd('normal! G')
 end
 
 return M

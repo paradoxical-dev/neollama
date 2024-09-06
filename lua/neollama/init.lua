@@ -40,7 +40,8 @@ M.config = {
             header_style = "underline",
             user_hl = "Normal",
             model_hl = "Normal",
-            virtual_text = {"╒", "│", "╘"}
+            virtual_text = {"╒", "│", "╘"},
+            virtual_text_hl = "Keyword",
         },
         input = {
             icon = ">",
