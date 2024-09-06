@@ -269,6 +269,7 @@ M.get_opts = function ()
         on_exit = function (j, return_val)
 
             local res = vim.json.decode(j:result()[1])
+            print(vim.inspect(res))
             local model_paramaters = res.parameters
 
             local vals = {}
