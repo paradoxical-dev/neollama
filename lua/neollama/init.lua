@@ -1,12 +1,12 @@
 local M = {}
 
+M.mediator = require('neollama.mediator')
 M.mediator.setup(M.api, M.Layout, M.Input, M.utils, M)
 
 M.utils = require('neollama.utils')
 M.Layout = require('neollama.layout')
 M.Input = require('neollama.input')
 M.api = require('neollama.api')
-M.mediator = require('neollama.mediator')
 
 -- Initial model loading for quickest response time in default session
 M.api.list_models()
