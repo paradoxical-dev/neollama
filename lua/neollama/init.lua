@@ -53,6 +53,14 @@ M.config = {
     }
 }
 
+_G.NeollamaModel = M.config.params.model
+M.api.params = {
+    model = _G.NeollamaModel,
+    messages = {},
+    stream = M.config.params.stream,
+    opts = M.config.params.default_options
+}
+
 M.setup = function (user_config)
     local config = vim.tbl_deep_extend('force', M.config, user_config)
     M.api.default_options = config.params.default_options
