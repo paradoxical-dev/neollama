@@ -16,7 +16,6 @@ M.setup = function (api, layout, input, util, init)
 
     util.set_plugin(init)
     util.set_layout_handler(layout)
-    util.set_input(input)
     util.set_api(api)
 end
 

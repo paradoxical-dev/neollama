@@ -2,7 +2,6 @@ local M = {}
 
 local plugin
 local LayoutHandler
-local input
 local API
 
 M.set_plugin = function (init)
@@ -11,10 +10,6 @@ end
 
 M.set_layout_handler = function(handler)
     LayoutHandler = handler
-end
-
-M.set_input = function (i)
-    input = i
 end
 
 M.set_api = function (api)
@@ -80,17 +75,17 @@ end
 local group_name = 'Neollama'
 local augroup = vim.api.nvim_create_augroup(group_name, {})
 M.og_keymaps = {}
-M.internal_keymaps = {
-    { mode = 'n', lhs = plugin.config.keymaps.toggle_layout, rhs = "<cmd>lua require('neollama.layout').toggle_layout()<CR>" },
-    { mode = 'n', lhs = plugin.config.keymaps.window_next, rhs = "<cmd>lua require('neollama.layout').window_next()<CR>" },
-    { mode = 'n', lhs = plugin.config.keymaps.window_prev, rhs = "<cmd>lua require('neollama.layout').window_prev()<CR>" },
-    { mode = 'n', lhs = plugin.config.keymaps.change_config, rhs = "<cmd>lua require('neollama.utils').change_config(vim.api.nvim_get_current_buf())<CR>" },
-    { mode = 'n', lhs = '<esc>', rhs = "<cmd>lua require('neollama.utils').close_map()<CR>" },
-}
 
 --[[ Queries for keymaps matching plugins internal keymaps and stores them 
 in `og_keymaps`before overwriting them with custom internals ]]
 M.set_keymaps = function()
+    M.internal_keymaps = {
+        { mode = 'n', lhs = plugin.config.keymaps.toggle_layout, rhs = "<cmd>lua require('neollama.layout').toggle_layout()<CR>" },
+        { mode = 'n', lhs = plugin.config.keymaps.window_next, rhs = "<cmd>lua require('neollama.layout').window_next()<CR>" },
+        { mode = 'n', lhs = plugin.config.keymaps.window_prev, rhs = "<cmd>lua require('neollama.layout').window_prev()<CR>" },
+        { mode = 'n', lhs = plugin.config.keymaps.change_config, rhs = "<cmd>lua require('neollama.utils').change_config(vim.api.nvim_get_current_buf())<CR>" },
+        { mode = 'n', lhs = '<esc>', rhs = "<cmd>lua require('neollama.utils').close_map()<CR>" },
+    }
     for _, keymap in ipairs(M.internal_keymaps) do
         local current_keymap = vim.api.nvim_get_keymap(keymap.mode)
         for _, map in ipairs(current_keymap) do
@@ -217,8 +212,8 @@ end
 --  CHAT/USER DATA --
 
 -- Writes the current session to the chat file followed by an empty string
-local chat_file = plugin.plugin_dir .. 'data/chats.lua'
 M.save_chat = function(name, value)
+    local chat_file = plugin.plugin_dir .. 'data/chats.lua'
     local file = io.open(chat_file, 'a+')
     if file then
         file:write('local ' .. name .. ' = ' .. tostring(vim.inspect(value)))
@@ -231,6 +226,7 @@ end
 
 -- Reads chat file into string and queries based on the passed in session name
 M.load_chat = function(name)
+    local chat_file = plugin.plugin_dir .. 'data/chats.lua'
     local file = io.open(chat_file, 'r')
     if not file then
         print('Chat file not found')
@@ -247,6 +243,7 @@ end
 
 -- Find-and-replace function for queries on the chats file
 M.overwrite_chat = function (target, repl_name,  repl)
+    local chat_file = plugin.plugin_dir .. 'data/chats.lua'
     local file = io.open(chat_file, 'r')
     if not file then
         print('Chat file not found')
@@ -268,8 +265,8 @@ M.overwrite_chat = function (target, repl_name,  repl)
 end
 
 -- Loads the undefined table in the user_data file as table to be defined and modified
-local user_file = plugin.plugin_dir .. 'data/user_data.json'
 M.chat_data = function ()
+    local user_file = plugin.plugin_dir .. 'data/user_data.json'
     local file = io.open(user_file, 'r')
     if not file then
         print('User data file not found')
@@ -286,6 +283,7 @@ end
 
 -- Reloading the table and inserting it back into the file after modifications have been made
 M.update_data = function (data)
+    local user_file = plugin.plugin_dir .. 'data/user_data.json'
     local file = io.open(user_file, 'w+')
     if not file then
         print('User data file not found')
