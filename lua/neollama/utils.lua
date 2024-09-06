@@ -81,11 +81,11 @@ local group_name = 'Neollama'
 local augroup = vim.api.nvim_create_augroup(group_name, {})
 M.og_keymaps = {}
 M.internal_keymaps = {
-    { mode = 'n', lhs = plugin.config.keymaps.toggle_layout, rhs = "<cmd>lua require('lilcumstain.neollama.layout').toggle_layout()<CR>" },
-    { mode = 'n', lhs = plugin.config.keymaps.window_next, rhs = "<cmd>lua require('lilcumstain.neollama.layout').window_next()<CR>" },
-    { mode = 'n', lhs = plugin.config.keymaps.window_prev, rhs = "<cmd>lua require('lilcumstain.neollama.layout').window_prev()<CR>" },
-    { mode = 'n', lhs = plugin.config.keymaps.change_config, rhs = "<cmd>lua require('lilcumstain.neollama.utils').change_config(vim.api.nvim_get_current_buf())<CR>" },
-    { mode = 'n', lhs = '<esc>', rhs = "<cmd>lua require('lilcumstain.neollama.utils').close_map()<CR>" },
+    { mode = 'n', lhs = plugin.config.keymaps.toggle_layout, rhs = "<cmd>lua require('neollama.layout').toggle_layout()<CR>" },
+    { mode = 'n', lhs = plugin.config.keymaps.window_next, rhs = "<cmd>lua require('neollama.layout').window_next()<CR>" },
+    { mode = 'n', lhs = plugin.config.keymaps.window_prev, rhs = "<cmd>lua require('neollama.layout').window_prev()<CR>" },
+    { mode = 'n', lhs = plugin.config.keymaps.change_config, rhs = "<cmd>lua require('neollama.utils').change_config(vim.api.nvim_get_current_buf())<CR>" },
+    { mode = 'n', lhs = '<esc>', rhs = "<cmd>lua require('neollama.utils').close_map()<CR>" },
 }
 
 --[[ Queries for keymaps matching plugins internal keymaps and stores them 
@@ -99,7 +99,7 @@ M.set_keymaps = function()
                 break
             end
         end
-        if keymap.rhs == "<cmd>lua require('lilcumstain.neollama.layout').window_next()<CR>" or keymap.rhs == "<cmd>lua require('lilcumstain.neollama.layout').window_prev()<CR>" then
+        if keymap.rhs == "<cmd>lua require('neollama.layout').window_next()<CR>" or keymap.rhs == "<cmd>lua require('neollama.layout').window_prev()<CR>" then
             vim.api.nvim_set_keymap(keymap.mode, keymap.lhs, keymap.rhs, {noremap = true, silent = true, nowait = true})
             goto continue
         end
