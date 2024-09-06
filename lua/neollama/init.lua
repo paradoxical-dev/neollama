@@ -1,22 +1,11 @@
 local M = {}
 
-M.mediator = require('neollama.mediator')
-M.mediator.setup(M.api, M.Layout, M.Input, M.utils, M)
+M.utils = nil
+M.Layout = nil
+M.Input = nil
+M.api = nil
+M.mediator = nil
 
-M.utils = require('neollama.utils')
-M.Layout = require('neollama.layout')
-M.Input = require('neollama.input')
-M.api = require('neollama.api')
-
--- Initial model loading for quickest response time in default session
-M.api.list_models()
-M.api.get_opts()
-
--- Ensure session variables are set to default upon loading
-M.active_session = false
-M.active_session_shown = false
-
-M.plugin_dir = debug.getinfo(1, 'S').source:sub(2):match("(.*[/\\])")
 
 M.config = {
     autoscroll = true,
@@ -64,12 +53,45 @@ M.config = {
     }
 }
 
+local function load_dependencies()
+    if not M.utils then
+        M.utils = require('neollama.utils')
+    end
+    if not M.Layout then
+        M.Layout = require('neollama.layout')
+    end
+    if not M.Input then
+        M.Input = require('neollama.input')
+    end
+    if not M.api then
+        M.api = require('neollama.api')
+    end
+    if not M.mediator then
+        M.mediator = require('neollama.mediator')
+    end
+end
+
 M.setup = function (user_config)
+    load_dependencies()
+
     local config = vim.tbl_deep_extend('force', M.config, user_config)
     M.api.default_options = config.params.default_options
     M.api.extra_opts = config.params.extra_opts
     M.config = config
+
+    M.mediator.setup(M.api, M.Layout, M.Input, M.utils, M)
 end
+
+-- Set plugin directory for acessing data files
+M.plugin_dir = debug.getinfo(1, 'S').source:sub(2):match("(.*[/\\])")
+
+-- Initial model loading for quickest response time in default session
+M.api.list_models()
+M.api.get_opts()
+
+-- Ensure session variables are set to default upon loading
+M.active_session = false
+M.active_session_shown = false
 
 M.initialize = function ()
     -- Opens session if one is available; remounting windows in their previous state
