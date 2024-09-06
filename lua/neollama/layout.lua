@@ -1,8 +1,6 @@
-require('lilcumstain.neollama.opts')
 local Popup = require('nui.popup')
 local Layout = require('nui.layout')
 local Menu = require('nui.menu')
-local event = require('nui.utils.autocmd').event
 
 local M = {}
 
