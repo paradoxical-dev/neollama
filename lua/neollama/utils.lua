@@ -288,7 +288,10 @@ M.update_data = function (data)
         print('User data file not found')
         return nil
     end
-    file:write(tostring(vim.inspect(vim.json.encode(data))))
+
+    local content = vim.json.encode(data)
+    file:write(content)
+    file:close()
 end
 
 -- TEXT/LAYOUT MANIPULATION --

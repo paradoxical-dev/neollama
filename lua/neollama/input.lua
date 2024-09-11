@@ -250,7 +250,8 @@ M.save_prompt = function (user_data, replacement)
                     end
 
                     print('Current session saved over ' .. replacement ..  ' as ' .. value)
-                    plugin.layout:show()
+                    -- plugin.layout:show()
+                    LayoutHandler.remount()
 
                     utils.set_keymaps()
                     LayoutHandler.update_window_selection()
