@@ -54,13 +54,6 @@ M.extra_opts = {
 M.done = false
 M.model_loaded = false
 
--- M.params = {
---     model = _G.NeollamaModel,
---     messages = {},
---     stream = plugin.config.params.stream,
---     opts = M.default_options,
--- }
-
 -- Default the response to an empty string for streamed responses
 M.constructed_response = ""
 
@@ -105,7 +98,7 @@ M.handle_stream = function (chunk)
     local line_count = vim.api.nvim_buf_line_count(plugin.popup.bufnr)
 
     local separated_response = M.separate_chunk(chunk)
-    if separated_response == {"  ", "  "} then
+    if separated_response == {"  "} then
         vim.api.nvim_buf_set_lines(plugin.popup.bufnr, line_count + 1, line_count + 1, false, separated_response)
         return
     end
@@ -134,9 +127,9 @@ M.response_split = function(response)
     local sep = "\n"
     local open_block = false
     local t = {}
-    table.insert(t, _G.NeollamaModel.. ':')
+    table.insert(t, response.model .. ':')
     table.insert(t,'')
-    for str in string.gmatch(response, "([^"..sep.."]+)") do
+    for str in string.gmatch(response.content, "([^"..sep.."]+)") do
         -- Checks for markdown header characters for section separation
         if string.find(str, '%*%*') or string.find(str, '#') then
             table.insert(t,'')
@@ -158,6 +151,7 @@ M.response_split = function(response)
         if not vim.api.nvim_win_is_valid(plugin.popup.winid) then
             LayoutHandler.update_window_selection()
         end
+
         if vim.fn.strdisplaywidth(str) >= vim.api.nvim_win_get_width(plugin.popup.winid) then
             local wrapped_line = utils.line_wrap(str, plugin.popup._.size.width - 2)
             for _, line in ipairs(wrapped_line) do
@@ -264,7 +258,7 @@ M.get_opts = function ()
         },
         cwd = '/usr/bin',
         on_stderr = function (err)
-            print('Error occured while accessing model parameters', 'Error: ' .. err)
+            print('Error occured while accessing model parameters', 'Error: ' .. vim.inspect(err))
         end,
         on_exit = function (j, return_val)
 
@@ -394,11 +388,13 @@ M.ollamaCall = function()
             local raw_response = j:result()
             local response = vim.json.decode(raw_response[1])
             if not M.params.stream then
+                response.message.model = response.model
                 table.insert(M.params.messages, #M.params.messages + 1, response.message)
             else
                 local response_table = {
                     role = "assistant",
-                    content = M.constructed_response
+                    content = M.constructed_response,
+                    model = response.model
                 }
                 table.insert(M.params.messages, #M.params.messages + 1, response_table)
             end

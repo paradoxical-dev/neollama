@@ -79,14 +79,18 @@ end
 -- hide the input during response generation
 M.hide_input = function ()
     plugin.popup = M.popup().popup
+    local resized_dimensions
+    if M.resized then
+        resized_dimensions = '95%'
+    end
 
     if M.menu_shown then
         plugin.model_picker = M.model_picker().menu
         plugin.session_picker = M.session_picker().menu
 
         plugin.layout:update({
-            position = plugin.config.layout.position,
-            size = plugin.config.layout.size,
+            position = resized_dimensions or plugin.config.layout.position,
+            size = resized_dimensions or plugin.config.layout.size,
         },
             Layout.Box({
                 Layout.Box({
@@ -102,8 +106,8 @@ M.hide_input = function ()
         return
     else
         plugin.layout:update({
-            position = plugin.config.layout.position,
-            size = plugin.config.layout.size,
+            position = resized_dimensions or plugin.config.layout.position,
+            size = resized_dimensions or plugin.config.layout.size,
         },
             Layout.Box({
                 Layout.Box({
