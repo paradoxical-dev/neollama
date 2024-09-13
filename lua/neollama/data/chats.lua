@@ -106,4 +106,38 @@ local joke = {
     top_p = 40
   },
   stream = true
+}local neollama = {
+  messages = { {
+      content = "I have a plugin for neovim ive been developing using lua. The plugin needs access to have access to 2 data files which are used as a sort of database to store persistent data. Until now, I have had the files simply located with the project, however, after hosting the project on github and isntalling my project using packer i realize this would not work and the users files would be reset with any installed update. With that being said, what should i do instead?",
+      role = "user"
+    }, {
+      content = "The classic problem of separating persistent data from your plugin's source code!\n\nYou're right; storing data files alongside your plugin's source code can lead to issues when updating or sharing the plugin. Here are a few strategies to consider:\n\n1. **Use a dedicated directory for user data**: Instead of storing the data files with your plugin, you can create a separate directory (e.g., `~/.config/neovim/myplugin/data`) where users can store their persistent data. This way, updates won't affect user-saved data.\n\nIn your Lua code, you can use the `vim.fn.stdpath('data')` function to get the path to the Neovim's data directory (usually `~/.cache/nvim`) and then create a subdirectory specific to your plugin.\n2. **Use a configuration file**: If you only have a small amount of data to store, consider using a single configuration file (e.g., `myplugin.cfg` or `settings.json`) that users can customize. This approach keeps the data separate from your plugin's code and is easy to manage.\n\nIn Lua, you can use the `io.open()` function to read/write this file, taking care to handle errors and ensure proper file permissions.\n3. **Use a dedicated storage solution**: For more complex or larger datasets, consider using a dedicated storage solution like a SQLite database or a JSON-based data store (e.g., `jshon` or `jsonl`). These solutions can be used to store and manage large amounts of data persistently.\n\nIn Lua, you can use libraries like `luasqlite` or `json.lua` to interact with the storage solution.\n4. **Provide a migration mechanism**: If you have existing users who are storing their data alongside your plugin's source code, consider providing a migration mechanism (e.g., a script that converts old file formats to new ones) to help them transition to the new storage approach.\n\nWhen deciding on an approach, keep in mind factors like:\n\n* The size and complexity of your data\n* The need for concurrent access or locking mechanisms\n* The ease of integration with your Lua code\n* The level of user customization you want to provide\n\nBy separating persistent data from your plugin's source code, you'll ensure that updates don't affect users' saved data, making your plugin more reliable and maintainable.",
+      model = "llama3",
+      role = "assistant"
+    }, {
+      content = "explain the vim.fn.stdpath function you mentioned.",
+      role = "user"
+    }, {
+      content = "In Neovim (and Vim), `vim.fn` is a namespace that provides various functions for working with files, directories, and other system resources.\n\nThe `stdpath()` function in particular returns the standard path for a specific directory type. The `stdpath()` function takes a single argument, which is one of the following constants:\n\n1. `'config'`: Returns the directory where Neovim stores its configuration files (e.g., `~/.config/neovim` on Unix-like systems).\n2. `'data'`: Returns the directory where Neovim stores temporary files and other data (e.g., `~/.cache/nvim` on Unix-like systems).\n3. `'runtime'`: Returns the directory where Neovim looks for scripts, syntax definitions, and other runtime resources (e.g., `~/.vim` on Unix-like systems).\n4. `'plugins'`: Returns the directory where Neovim stores its plugin files (e.g., `~/.local/share/nvim/plugged` on Unix-like systems).\n\nFor example, if you want to get the path to the standard data directory in your Lua code, you can use:\n```lua\nlocal data_dir = vim.fn.stdpath('data')\nprint(data_dir)  -- Output: e.g., \"/home/user/.cache/nvim\"\n```\nBy using `stdpath()` with a specific directory type, you can ensure that your plugin uses the correct directory for storing and reading files, regardless of the user's operating system or Neovim installation.\n\nIn your case, since you want to store your plugin's data files in a dedicated directory, you could use `vim.fn.stdpath('data')` as the base directory for your files. This way, you can ensure that your data files are stored in a location that is safe from updates and is easily accessible by your Lua code.",
+      model = "llama3",
+      role = "assistant"
+    } },
+  model = "llama3",
+  opts = {
+    mirostat = 0,
+    mirostat_eta = 0.1,
+    mirostat_tau = 5,
+    num_ctx = 2048,
+    num_keep = 24,
+    num_predict = 128,
+    repeat_last_n = 64,
+    repeat_penalty = 1.1,
+    seed = 0,
+    stop = { '"<|start_header_id|>"', '"<|end_header_id|>"', '"<|eot_id|>"' },
+    temperature = 0.8,
+    tfs_z = 1,
+    top_k = 40,
+    top_p = 40
+  },
+  stream = true
 }

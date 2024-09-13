@@ -211,6 +211,51 @@ end
 
 --  CHAT/USER DATA --
 
+-- Checks if data directory and file structure exists before ensuring user_data file is populated
+local data_dir = vim.env.HOME .. '/.local/share/nvim/neollama'
+M.data_dir_check = function ()
+    if not os.execute('stat ' .. data_dir) then
+        print('No data directory could be located. Creating directory at ' .. data_dir)
+        os.execute('mkdir -p ' .. data_dir)
+    end
+
+    local function check_file()
+        if not os.execute('stat ' .. data_dir .. '/chats.lua') then
+            print('No chat file could be located. Creating file at ' .. data_dir .. '/chats.lua')
+            os.execute('touch ' .. data_dir .. '/chats.lua')
+        elseif not os.execute('stat ' .. data_dir .. '/user_data.json') then
+            print('No user file could be located. Creating file at ' .. data_dir .. '/user_data.json')
+            os.execute('touch ' .. data_dir .. '/user_data.json')
+        end
+    end
+    check_file()
+
+    local function data_check()
+        local user_data = io.open(data_dir .. '/user_data.json', 'r')
+        local user_content
+        if user_data then
+            user_content = user_data:read("all*")
+            user_data:close()
+        end
+
+        if not user_content:find('}') then
+            local default_config = {
+                max_chats = plugin.config.max_chats,
+                num_chats = 0,
+                sessions = {}
+            }
+
+            user_data = io.open(data_dir .. '/user_data.json', 'w')
+            if user_data then
+                user_data:write(vim.json.encode(default_config))
+                user_data:close()
+            end
+        end
+    end
+
+    data_check()
+end
+
 -- Writes the current session to the chat file followed by an empty string
 M.save_chat = function(name, value)
     local chat_file = plugin.plugin_dir .. 'data/chats.lua'
@@ -226,7 +271,7 @@ end
 
 -- Reads chat file into string and queries based on the passed in session name
 M.load_chat = function(name)
-    local chat_file = plugin.plugin_dir .. 'data/chats.lua'
+    local chat_file = data_dir .. '/chats.lua'
     local file = io.open(chat_file, 'r')
     if not file then
         print('Chat file not found')
@@ -243,7 +288,7 @@ end
 
 -- Find-and-replace function for queries on the chats file
 M.overwrite_chat = function (target, repl_name,  repl)
-    local chat_file = plugin.plugin_dir .. 'data/chats.lua'
+    local chat_file = data_dir .. '/chats.lua'
     local file = io.open(chat_file, 'r')
     if not file then
         print('Chat file not found')
@@ -265,7 +310,7 @@ end
 
 -- Loads the undefined table in the user_data file as table to be defined and modified
 M.chat_data = function ()
-    local user_file = plugin.plugin_dir .. 'data/user_data.json'
+    local user_file = data_dir .. '/user_data.json'
     local file = io.open(user_file, 'r')
     if not file then
         print('User data file not found')
@@ -282,7 +327,7 @@ end
 
 -- Reloading the table and inserting it back into the file after modifications have been made
 M.update_data = function (data)
-    local user_file = plugin.plugin_dir .. 'data/user_data.json'
+    local user_file = data_dir .. '/user_data.json'
     local file = io.open(user_file, 'w+')
     if not file then
         print('User data file not found')
