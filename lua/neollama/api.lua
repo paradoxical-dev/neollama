@@ -134,6 +134,7 @@ M.response_split = function(response)
         if string.find(str, '%*%*') or string.find(str, '#') then
             table.insert(t,'')
         end
+
         --[[ Checks for code blocks and determins whether they are open or closed as well as determining 
         if code blocks hava a defined language; adding a placeholder language if needed ]]
         if string.find(str, '```') and not open_block then
@@ -154,6 +155,7 @@ M.response_split = function(response)
 
         if vim.fn.strdisplaywidth(str) >= vim.api.nvim_win_get_width(plugin.popup.winid) then
             local wrapped_line = utils.line_wrap(str, plugin.popup._.size.width - 2)
+
             for _, line in ipairs(wrapped_line) do
                 table.insert(t, '  ' .. line)
             end

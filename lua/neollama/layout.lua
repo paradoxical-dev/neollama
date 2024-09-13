@@ -237,6 +237,7 @@ M.insert_input = function(popup,value)
 
     if current_lines <= 1 then
         vim.api.nvim_buf_set_lines(buf, 0, -1, false, wrapped_lines)
+
     else
         vim.api.nvim_buf_set_lines(buf, current_lines + 1, -1, false, wrapped_lines)
     end
@@ -255,11 +256,11 @@ M.insert_response = function(popup,response)
     vim.api.nvim_buf_set_lines(buf, current_lines + 1, current_lines + 1, false, res)
     for i=current_lines + 2, vim.api.nvim_buf_line_count(buf) - 1 do
         if i == current_lines + 2 then
-            M.insert_vtext(buf, i, config.virtual_text[1], config.virtual_text_hl, "NeollamaChatVirtualText")
+            M.insert_vtext(buf, i, config.virtual_text[1], config.hl.virtual_text_hl, "NeollamaChatVirtualText")
         elseif i == vim.api.nvim_buf_line_count(buf) - 1 then
-            M.insert_vtext(buf, i, config.virtual_text[3], config.virtual_text_hl, "NeollamaChatVirtualText")
+            M.insert_vtext(buf, i, config.virtual_text[3], config.hl.virtual_text_hl, "NeollamaChatVirtualText")
         else
-            M.insert_vtext(buf, i, config.virtual_text[2], config.virtual_text_hl, "NeollamaChatVirtualText")
+            M.insert_vtext(buf, i, config.virtual_text[2], config.hl.virtual_text_hl, "NeollamaChatVirtualText")
         end
     end
 end
@@ -275,7 +276,7 @@ M.popup = function ()
         enter = true,
         focusable = true,
         border = {
-            style = plugin.config.layout.border,
+            style = plugin.config.layout.border.default,
             text = {
                 top = ' ' .. _G.NeollamaModel .. ' ',
                 top_align = 'center',
@@ -307,7 +308,7 @@ M.overwrite_menu = function ()
     self.menu = Menu({
         relative = 'editor',
         border = {
-            style = plugin.config.layout.border,
+            style = plugin.config.layout.border.default,
             text = {
                 top = "{ Model to Overwrite }",
                 top_align = 'center',
@@ -369,7 +370,7 @@ M.session_picker = function ()
         relative = 'editor',
         enter = false,
         border = {
-            style = plugin.config.layout.border,
+            style = plugin.config.layout.border.default,
             text = {
                 top = "   Saved Sessions ",
                 top_align = 'center',
@@ -464,7 +465,7 @@ M.model_picker = function ()
         relative = 'editor',
         enter = false,
         border = {
-            style = plugin.config.layout.border,
+            style = plugin.config.layout.border.default,
             text = {
                 top = "   Model ",
                 top_align = 'center',
@@ -543,7 +544,7 @@ M.param_viewer = function ()
         focusable = true,
         zindex = 1,
         border = {
-            style = plugin.config.layout.border,
+            style = plugin.config.layout.border.default,
             text = {
                 top = ' ' .. 'Config Editor' .. ' ',
                 top_align = 'center',

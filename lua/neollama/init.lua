@@ -18,20 +18,27 @@ M.config = {
         extra_opts = M.api.extra_opts
     },
     layout = {
-        border = 'rounded',
+        border = {
+            default = "rounded",
+            current = "rounded",
+        },
         size = {
             width = '70%',
             height = '80%'
         },
         position = '50%',
-        title_hl = "String",
-        border_hl = "FloatBorder",
+        hl = {
+            title = "String",
+            default_border = "FloatBorder",
+            current_border = "FloatBorder",
+        },
         popup = {
-            header_style = "underline",
-            user_hl = "Normal",
-            model_hl = "Normal",
+            hl = {
+                user_header = "Normal",
+                model_header = "Normal",
+                virtual_text_hl = "Keyword",
+            },
             virtual_text = {"╒", "│", "╘"},
-            virtual_text_hl = "Keyword",
         },
         input = {
             icon = ">",
