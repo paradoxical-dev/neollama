@@ -10,6 +10,7 @@ M.mediator.setup(M.api, M.Layout, M.Input, M.utils, M)
 M.config = {
     autoscroll = true,
     hide_cursor = true,
+    max_chats = 10,
     params = {
         model = 'llama3',
         stream = false,
@@ -70,8 +71,8 @@ M.setup = function (user_config)
     _G.NeollamaModel = config.params.model
 end
 
--- Set plugin directory for acessing data files
-M.plugin_dir = debug.getinfo(1, 'S').source:sub(2):match("(.*[/\\])")
+-- Run the data files through the checker upon initialization
+M.utils.data_dir_check()
 
 -- Initial model loading for quickest response time in default session
 M.api.list_models()

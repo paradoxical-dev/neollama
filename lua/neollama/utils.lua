@@ -214,30 +214,52 @@ end
 -- Checks if data directory and file structure exists before ensuring user_data file is populated
 local data_dir = vim.env.HOME .. '/.local/share/nvim/neollama'
 M.data_dir_check = function ()
-    if not os.execute('stat ' .. data_dir) then
+    if not vim.loop.fs_stat(data_dir) then
         print('No data directory could be located. Creating directory at ' .. data_dir)
-        os.execute('mkdir -p ' .. data_dir)
+        vim.loop.fs_mkdir(data_dir, 511)
     end
 
     local function check_file()
-        if not os.execute('stat ' .. data_dir .. '/chats.lua') then
-            print('No chat file could be located. Creating file at ' .. data_dir .. '/chats.lua')
-            os.execute('touch ' .. data_dir .. '/chats.lua')
-        elseif not os.execute('stat ' .. data_dir .. '/user_data.json') then
-            print('No user file could be located. Creating file at ' .. data_dir .. '/user_data.json')
-            os.execute('touch ' .. data_dir .. '/user_data.json')
-        end
-    end
-    check_file()
+        local files = {data_dir .. '/chats.lua', data_dir .. '/user_data.json'}
+        local files_needed = false
 
+        for _, file in ipairs(files) do
+            if not vim.loop.fs_stat(file) then
+                print('No chat file could be located. Creating file at ' .. file)
+                files_needed = true
+                local f = io.open(file, 'w')
+                if f then f:close() end
+            end
+        end
+
+        return not files_needed
+    end
+    -- check_file()
+
+    local file_creation_attempt = 1
+    local max_attempts = 6
     local function data_check()
+        if not check_file() then
+            file_creation_attempt = file_creation_attempt + 1
+            if file_creation_attempt > max_attempts then
+                print('Neollama: Function timed out waiting for data files to be created. Please try again')
+                return
+            else
+                M.setTimeout(0.25, data_check)
+                return
+            end
+        end
+
         local user_data = io.open(data_dir .. '/user_data.json', 'r')
         local user_content
         if user_data then
-            user_content = user_data:read("all*")
+            user_content = user_data:read("*all")
             user_data:close()
         end
 
+        if not user_content then
+            print('The user data file was either not created or could not be read. Please try again.\nIf the issue persists check the following files:\n' .. data_dir .. '/chats.lua\n' .. data_dir .. '/user_data.json')
+        end
         if not user_content:find('}') then
             local default_config = {
                 max_chats = plugin.config.max_chats,
