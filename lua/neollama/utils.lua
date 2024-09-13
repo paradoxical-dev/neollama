@@ -258,7 +258,7 @@ end
 
 -- Writes the current session to the chat file followed by an empty string
 M.save_chat = function(name, value)
-    local chat_file = plugin.plugin_dir .. 'data/chats.lua'
+    local chat_file = data_dir .. '/chats.lua'
     local file = io.open(chat_file, 'a+')
     if file then
         file:write('local ' .. name .. ' = ' .. tostring(vim.inspect(value)))
