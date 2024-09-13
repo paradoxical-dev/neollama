@@ -29,14 +29,14 @@ M.config = {
         position = '50%',
         hl = {
             title = "String",
-            default_border = "FloatBorder",
-            current_border = "FloatBorder",
+            default_border = {fg = "FloatBorder"},
+            current_border = {fg = "FloatBorder"},
         },
         popup = {
             hl = {
-                user_header = "Normal",
-                model_header = "Normal",
-                virtual_text_hl = "Keyword",
+                user_header = {fg = "Keyword", bold = true},
+                model_header = {fg = "Normal", bold = true},
+                virtual_text_hl = {fg = "Keyword"},
             },
             virtual_text = {"╒", "│", "╘"},
         },
@@ -76,6 +76,12 @@ M.setup = function (user_config)
     M.config = config
 
     _G.NeollamaModel = config.params.model
+
+    vim.api.nvim_set_hl(0, "NeollamaUserHeader", config.layout.popup.hl.user_header)
+    vim.api.nvim_set_hl(0, "NeollamaModelHeader", config.layout.popup.hl.model_header)
+    vim.api.nvim_set_hl(0, "NeollamaWindowTitle", config.layout.hl.title)
+    vim.api.nvim_set_hl(0, "NeollamaCurrentBorder", config.layout.hl.current_border)
+    vim.api.nvim_set_hl(0, "NeollamaDefaultBorder", config.layout.hl.default_border)
 end
 
 -- Run the data files through the checker upon initialization
