@@ -28,15 +28,15 @@ M.config = {
         },
         position = '50%',
         hl = {
-            title = "String",
-            default_border = {fg = "FloatBorder"},
-            current_border = {fg = "FloatBorder"},
+            title = {link = "String"},
+            default_border = {link = "FloatBorder"},
+            current_border = {link = "FloatBorder"},
         },
         popup = {
             hl = {
-                user_header = {fg = "Keyword", bold = true},
-                model_header = {fg = "Normal", bold = true},
-                virtual_text_hl = {fg = "Keyword"},
+                user_header = {link = "Keyword"},
+                model_header = {link = "Keyword"},
+                virtual_text_hl = "Conditional",
             },
             virtual_text = {"╒", "│", "╘"},
         },

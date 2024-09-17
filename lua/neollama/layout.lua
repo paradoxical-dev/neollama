@@ -288,6 +288,9 @@ M.popup = function ()
             modifiable = true,
             readonly = false,
         },
+        win_options = {
+            winhighlight = "Normal:Normal,FloatBorder:NeollamaDefaultBorder",
+        },
     })
     return self
 end
