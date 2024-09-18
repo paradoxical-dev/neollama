@@ -230,10 +230,11 @@ M.save_prompt = function (user_data, replacement)
             default_value = nil,
             on_close = function()
                 print("Session save cancelled")
-                plugin.input:show()
-                plugin.popup:show()
-                if M.menu_shown then
-                    plugin.layout:show()
+                plugin.layout:show()
+
+                if API.params.messages ~= nil then
+                    utils.reformat_session(API.params.messages)
+                    utils.set_keymaps()
                 end
                 LayoutHandler.update_window_selection()
             end,

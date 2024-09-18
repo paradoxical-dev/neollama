@@ -572,11 +572,17 @@ end
 M.main_layout = function(p, i, menu1, menu2)
     local self = {}
     setmetatable(self, {__index = M})
+
+    local max_size
+    if vim.o.columns < 120 or vim.o.lines < 35 then
+        max_size = "95%"
+        M.resized = true
+    end
     if menu1 and menu2 then
         self.layout = Layout({
             relative = 'editor',
             position = plugin.config.layout.position,
-            size = plugin.config.layout.size,
+            size = max_size or plugin.config.layout.size,
         },
             Layout.Box({
                 Layout.Box({
@@ -606,7 +612,7 @@ M.main_layout = function(p, i, menu1, menu2)
         self.layout = Layout({
             relative = 'editor',
             position = plugin.config.layout.position,
-            size = plugin.config.layout.size,
+            size = max_size or plugin.config.layout.size,
         },
             Layout.Box({
                 Layout.Box({

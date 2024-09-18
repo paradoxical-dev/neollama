@@ -383,23 +383,28 @@ end
 
 M.session_resize = function ()
     if vim.o.columns < 120 or vim.o.lines < 35 then
-        plugin.layout:update({
-            position = "50%",
-            size = {
-                width = "95%",
-                height = "95%"
-            }
-        })
+
+        if plugin.active_session and plugin.active_session_shown then
+            plugin.layout:update({
+                position = "50%",
+                size = {
+                    width = "95%",
+                    height = "95%"
+                }
+            })
+        end
 
         LayoutHandler.resized = true
     else
-        plugin.layout:update({
-            position = "50%",
-            size = {
-                width = "70%",
-                height = "80%"
-            }
-        })
+        if plugin.active_session and plugin.active_session_shown then
+            plugin.layout:update({
+                position = "50%",
+                size = {
+                    width = "70%",
+                    height = "80%"
+                }
+            })
+        end
 
         LayoutHandler.resized = false
     end
