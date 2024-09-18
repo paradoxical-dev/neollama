@@ -30,7 +30,7 @@ M.config = {
         hl = {
             title = {link = "String"},
             default_border = {link = "FloatBorder"},
-            current_border = {link = "FloatBorder"},
+            current_border = {link = "Boolean"},
         },
         popup = {
             hl = {

@@ -123,11 +123,15 @@ end
 M.check_window = function ()
     local winid = vim.fn.win_getid()
     local is_neollama = false
-    for _, value in ipairs(LayoutHandler.window_selection) do
+
+    for index, value in ipairs(LayoutHandler.window_selection) do
         if value == winid then
             is_neollama = true
+            M.set_active_border(index)
+            break
         end
     end
+
     if not is_neollama then
         plugin.layout:hide()
 
@@ -143,6 +147,33 @@ M.close_map = function ()
     plugin.layout:unmount()
     plugin.active_session_shown = false
     plugin.active_session = false
+end
+
+M.set_active_border = function (window_index)
+    local windows = {"popup", "input", "model_picker", "session_picker"}
+
+    print(window_index)
+    local window_type = windows[window_index]
+    print(window_type)
+    print(plugin[window_type].border)
+
+    plugin[window_type].border:set_highlight('NeollamaCurrentBorder')
+    -- plugin[window_type]:update({
+    --     win_options = {
+    --         winhighlight = "Normal:Normal,FloatBorder:NeollamaCurrentBorder",
+    --     },
+    -- })
+
+    for i, v in ipairs(windows) do
+        if i ~= window_index then
+            plugin[v].border:set_highlight('NeollamaDefaultBorder')
+            -- plugin[v]:update({
+            --     win_options = {
+            --         winhighlight = "Normal:Normal,FloatBorder:NeollamaDefaultBorder",
+            --     },
+            -- })
+        end
+    end
 end
 
 -- CONFIG HANDLING --
@@ -211,8 +242,9 @@ end
 
 --  CHAT/USER DATA --
 
--- Checks if data directory and file structure exists before ensuring user_data file is populated
 local data_dir = vim.env.HOME .. '/.local/share/nvim/neollama'
+
+-- Checks if data directory and file structure exists before ensuring user_data file is populated
 M.data_dir_check = function ()
     if not vim.loop.fs_stat(data_dir) then
         print('No data directory could be located. Creating directory at ' .. data_dir)
