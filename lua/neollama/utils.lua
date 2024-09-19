@@ -123,11 +123,12 @@ end
 M.check_window = function ()
     local winid = vim.fn.win_getid()
     local is_neollama = false
+    -- local window_index
 
     for index, value in ipairs(LayoutHandler.window_selection) do
         if value == winid then
             is_neollama = true
-            M.set_active_border(index)
+            window_index = index
             break
         end
     end
@@ -139,39 +140,40 @@ M.check_window = function ()
         plugin.active_session_shown = false
         return
     else
+        -- vim.schedule(function ()
+        --     if window_index then
+        --         M.set_active_border(window_index)
+        --     end
+        -- end, 0)
         M.set_keymaps()
     end
 end
 
 M.close_map = function ()
-    plugin.layout:unmount()
+    if plugin.layout then
+        plugin.layout:unmount()
+    end
     plugin.active_session_shown = false
     plugin.active_session = false
 end
 
 M.set_active_border = function (window_index)
-    local windows = {"popup", "input", "model_picker", "session_picker"}
+    local windows = {plugin.popup.border, plugin.input.border, plugin.model_picker.border, plugin.session_picker.border}
+    -- local windows = {"popup", "input", "model_picker", "session_picker"}
 
-    print(window_index)
+    if not window_index or not windows[window_index] then
+        return
+    end
+
     local window_type = windows[window_index]
-    print(window_type)
-    print(plugin[window_type].border)
 
-    plugin[window_type].border:set_highlight('NeollamaCurrentBorder')
-    -- plugin[window_type]:update({
-    --     win_options = {
-    --         winhighlight = "Normal:Normal,FloatBorder:NeollamaCurrentBorder",
-    --     },
-    -- })
+    if window_type then
+        window_type:set_highlight('NeollamaCurrentBorder')
+    end
 
     for i, v in ipairs(windows) do
         if i ~= window_index then
-            plugin[v].border:set_highlight('NeollamaDefaultBorder')
-            -- plugin[v]:update({
-            --     win_options = {
-            --         winhighlight = "Normal:Normal,FloatBorder:NeollamaDefaultBorder",
-            --     },
-            -- })
+            v:set_highlight('NeollamaDefaultBorder')
         end
     end
 end
