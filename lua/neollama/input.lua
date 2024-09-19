@@ -30,12 +30,12 @@ M.new = function ()
         border = {
             style = plugin.config.layout.border.default,
             text = {
-                top = " Prompt: ",
+                top = text,
                 top_align = "center",
             },
         },
         win_options = {
-            winhighlight = "Normal:Normal,FloatBorder:Normal",
+            winhighlight = "Normal:Normal,FloatBorder:NeollamaDefaultBorder",
         },
     }, {
             prompt = plugin.config.layout.input.icon .. " ",
@@ -110,7 +110,7 @@ M.new = function ()
                     -- initiate empty response string for streamed responses and include empty lines to preserve separation
                     if API.params.stream then
                         local line_count = vim.api.nvim_buf_line_count(plugin.popup.bufnr)
-                        vim.api.nvim_buf_set_lines(plugin.popup.bufnr, line_count + 1, line_count + 1, false, {_G.NeollamaModel .. ': ', "  ", "  "})
+                        vim.api.nvim_buf_set_lines(plugin.popup.bufnr, line_count + 1, line_count + 1, false, {_G.NeollamaModel .. ':', "  ", "  "})
 
                         API.constructed_response = ""
                     end
@@ -192,7 +192,7 @@ M.save_prompt = function (user_data, replacement)
             },
         },
         win_options = {
-            winhighlight = "Normal:Normal,FloatBorder:Normal",
+            winhighlight = "Normal:Normal,FloatBorder:NeollamaDefaultBorder",
         },
     }, {
             prompt = "> ",

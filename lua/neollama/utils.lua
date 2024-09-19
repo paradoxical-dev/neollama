@@ -481,7 +481,7 @@ M.set_user_heading = function (buf, buf_lines)
     for line_count, line in ipairs(buf_lines) do
         local start = 1
         while true do
-            local start_col, end_col = string.find(line, "User: ", start)
+            local start_col, end_col = string.find(line, "User:", start)
             if start_col then
                 vim.api.nvim_buf_add_highlight(buf, -1, "NeollamaUserHeader", line_count - 1, start_col - 1, end_col)
                 start = end_col + 1
@@ -493,11 +493,14 @@ M.set_user_heading = function (buf, buf_lines)
 end
 
 M.set_model_heading = function (buf, model, buf_lines)
+    print(model)
+    print(vim.inspect(buf_lines))
     for line_count, line in ipairs(buf_lines) do
         local start = 1
         while true do
-            local start_col, end_col = string.find(line, model .. ": ", start)
+            local start_col, end_col = string.find(line, model .. ":", start)
             if start_col then
+                print('checked', model)
                 vim.api.nvim_buf_add_highlight(buf, -1, "NeollamaModelHeader", line_count - 1, start_col - 1, end_col)
                 start = end_col + 1
             else

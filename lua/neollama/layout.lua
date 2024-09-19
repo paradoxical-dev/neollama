@@ -229,7 +229,7 @@ M.insert_input = function(popup,value)
     local buf = popup.bufnr
     local current_lines = vim.api.nvim_buf_line_count(buf)
 
-    local wrapped_lines = {"User: "}
+    local wrapped_lines = {"User:"}
     local t = utils.line_wrap(value, popup._.size.width - 2)
     for _, line in ipairs(t) do
         table.insert(wrapped_lines, line)
@@ -336,6 +336,9 @@ M.overwrite_menu = function ()
             width = 35,
             height = 5,
         },
+        win_options = {
+            winhighlight = "Normal:Normal,FloatBorder:NeollamaDefaultBorder",
+        },
     }, {
             lines = opts,
             keymap = {
@@ -393,6 +396,9 @@ M.session_picker = function ()
                 top_align = 'center',
             },
             padding = {1,1}
+        },
+        win_options = {
+            winhighlight = "Normal:Normal,FloatBorder:NeollamaDefaultBorder",
         },
     }, {
             lines = opts,
@@ -490,6 +496,9 @@ M.model_picker = function ()
             },
             padding = {1,1}
         },
+        win_options = {
+            winhighlight = "Normal:Normal,FloatBorder:NeollamaDefaultBorder",
+        },
     }, {
             lines = model_list,
             keymap = {
@@ -581,6 +590,9 @@ M.param_viewer = function ()
             filetype = 'lua',
             modifiable = true,
             readonly = false,
+        },
+        win_options = {
+            winhighlight = "Normal:Normal,FloatBorder:NeollamaDefaultBorder",
         },
     })
     return self

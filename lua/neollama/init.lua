@@ -30,7 +30,6 @@ M.config = {
         hl = {
             title = {link = "Comment"},
             default_border = {link = "FloatBorder"},
-            current_border = {link = "Boolean"},
         },
         popup = {
             hl = {
