@@ -1,6 +1,7 @@
 local Popup = require('nui.popup')
 local Layout = require('nui.layout')
 local Menu = require('nui.menu')
+local NuiText = require("nui.text")
 
 local M = {}
 
@@ -242,6 +243,8 @@ M.insert_input = function(popup,value)
         vim.api.nvim_buf_set_lines(buf, current_lines + 1, -1, false, wrapped_lines)
     end
 
+    utils.set_user_heading(buf, vim.api.nvim_buf_get_lines(buf, 0, -1, false))
+
     vim.cmd('stopinsert')
 end
 
@@ -256,13 +259,17 @@ M.insert_response = function(popup,response)
     vim.api.nvim_buf_set_lines(buf, current_lines + 1, current_lines + 1, false, res)
     for i=current_lines + 2, vim.api.nvim_buf_line_count(buf) - 1 do
         if i == current_lines + 2 then
-            M.insert_vtext(buf, i, config.virtual_text[1], config.hl.virtual_text_hl, "NeollamaChatVirtualText")
+            M.insert_vtext(buf, i, config.virtual_text[1], "NeollamaChatVirtualText", "NeollamaChatVirtualText")
         elseif i == vim.api.nvim_buf_line_count(buf) - 1 then
-            M.insert_vtext(buf, i, config.virtual_text[3], config.hl.virtual_text_hl, "NeollamaChatVirtualText")
+            M.insert_vtext(buf, i, config.virtual_text[3], "NeollamaChatVirtualText", "NeollamaChatVirtualText")
         else
-            M.insert_vtext(buf, i, config.virtual_text[2], config.hl.virtual_text_hl, "NeollamaChatVirtualText")
+            M.insert_vtext(buf, i, config.virtual_text[2], "NeollamaChatVirtualText", "NeollamaChatVirtualText")
         end
     end
+
+    utils.set_model_heading(buf, response.model, vim.api.nvim_buf_get_lines(buf, 0, -1, false))
+
+    vim.cmd('stopinsert')
 end
 
 -- WINDOW CREATION --
@@ -271,6 +278,8 @@ end
 M.popup = function ()
     local self = {}
     setmetatable(self, {__index = M})
+
+    local text = NuiText(' ' .. _G.NeollamaModel .. ' ', 'NeollamaWindowTitle')
     self.popup = Popup({
         relative = 'editor',
         enter = true,
@@ -278,8 +287,9 @@ M.popup = function ()
         border = {
             style = plugin.config.layout.border.default,
             text = {
-                top = ' ' .. _G.NeollamaModel .. ' ',
+                top = text,
                 top_align = 'center',
+                top_hl = "NeollamaWindowTitle"
             },
             padding = {1, 1},
         },
@@ -299,6 +309,7 @@ end
 M.overwrite_menu = function ()
     local self = {}
     setmetatable(self, {__index = M})
+
     local user_data = utils.chat_data()
     local function get_opts()
         local t = {}
@@ -308,12 +319,14 @@ M.overwrite_menu = function ()
         return t
     end
     local opts = get_opts()
+
+    local text = NuiText("{ Model to Overwrite }", "NeollamaWindowTitle")
     self.menu = Menu({
         relative = 'editor',
         border = {
             style = plugin.config.layout.border.default,
             text = {
-                top = "{ Model to Overwrite }",
+                top = text,
                 top_align = 'center',
             },
             padding = {1,0}
@@ -367,15 +380,16 @@ M.session_picker = function ()
         end
         return t
     end
-
     local opts = get_opts()
+
+    local text = NuiText("   Saved Sessions ", "NeollamaWindowTitle")
     self.menu = Menu({
         relative = 'editor',
         enter = false,
         border = {
             style = plugin.config.layout.border.default,
             text = {
-                top = "   Saved Sessions ",
+                top = text,
                 top_align = 'center',
             },
             padding = {1,1}
@@ -457,20 +471,21 @@ M.model_picker = function ()
     local model_list
     if API.model_list == nil then
         print('Delayed start: Model list')
-        utils.setTimeout(1, function ()
+        utils.setTimeout(0.25, function ()
             model_list = prep(API.model_list)
         end, function() return API.model_list end)
     else
         model_list = prep(API.model_list)
     end
 
+    local text = NuiText("   Model ", "NeollamaWindowTitle")
     self.menu = Menu({
         relative = 'editor',
         enter = false,
         border = {
             style = plugin.config.layout.border.default,
             text = {
-                top = "   Model ",
+                top = text,
                 top_align = 'center',
             },
             padding = {1,1}
@@ -541,6 +556,8 @@ end
 M.param_viewer = function ()
     local self = {}
     setmetatable(self, {__index = M})
+
+    local text = NuiText(' Config Editor ', 'NeollamaWindowTitle')
     self.popup = Popup({
         relative = 'editor',
         enter = true,
@@ -549,7 +566,7 @@ M.param_viewer = function ()
         border = {
             style = plugin.config.layout.border.default,
             text = {
-                top = ' ' .. 'Config Editor' .. ' ',
+                top = text,
                 top_align = 'center',
             },
             padding = {1, 1},

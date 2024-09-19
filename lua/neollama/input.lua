@@ -1,5 +1,6 @@
 local Input = require('nui.input')
 local utils = require('neollama.utils')
+local NuiText = require('nui.text')
 
 local M = {}
 
@@ -19,45 +20,11 @@ M.set_plugin = function (init)
     plugin = init
 end
 
-M.remount = function ()
-    if API.done == false then
-        utils.setTimeout(1, function ()
-            local i = M.new()
-            plugin.input = i.input
-            plugin.input:mount()
-            LayoutHandler.window_selection[2] = plugin.input.winid
-            if LayoutHandler.menu_shown == true then
-                plugin.input:update_layout({
-                    position = {
-                        col = "30%",
-                        row = "80%"
-                    }
-                })
-            end
-            API.done = false
-            LayoutHandler.window_selection[2] = plugin.input.winid
-        end, function() return API.done end)
-    else
-        local i = M.new()
-        plugin.input = i.input
-        plugin.input:mount()
-        LayoutHandler.window_selection[2] = plugin.input.winid
-        if LayoutHandler.menu_shown == true then
-            plugin.input:update_layout({
-                position = {
-                    col = "30%",
-                    row = "80%"
-                }
-            })
-        end
-        API.done = false
-        LayoutHandler.window_selection[2] = plugin.input.winid
-    end
-end
-
 M.new = function ()
     local self = {}
     setmetatable(self, {__index = M})
+
+    local text = NuiText(' Prompt: ', 'NeollamaWindowTitle')
     self.input = Input({
         relative = 'editor',
         border = {
@@ -143,7 +110,7 @@ M.new = function ()
                     -- initiate empty response string for streamed responses and include empty lines to preserve separation
                     if API.params.stream then
                         local line_count = vim.api.nvim_buf_line_count(plugin.popup.bufnr)
-                        vim.api.nvim_buf_set_lines(plugin.popup.bufnr, line_count + 1, line_count + 1, false, {_G.NeollamaModel .. ':', "  ", "  "})
+                        vim.api.nvim_buf_set_lines(plugin.popup.bufnr, line_count + 1, line_count + 1, false, {_G.NeollamaModel .. ': ', "  ", "  "})
 
                         API.constructed_response = ""
                     end
@@ -205,6 +172,8 @@ end
 M.save_prompt = function (user_data, replacement)
     local self = {}
     setmetatable(self, {__index = M})
+
+    local text = NuiText(' Session Name: ', 'NeollamaWindowTitle')
     self.input = Input({
         relative = 'editor',
         position = {
@@ -218,7 +187,7 @@ M.save_prompt = function (user_data, replacement)
         border = {
             style = "rounded",
             text = {
-                top = " Session Name: ",
+                top = text,
                 top_align = "center",
             },
         },

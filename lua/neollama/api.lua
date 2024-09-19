@@ -127,7 +127,7 @@ M.response_split = function(response)
     local sep = "\n"
     local open_block = false
     local t = {}
-    table.insert(t, response.model .. ':')
+    table.insert(t, response.model .. ': ')
     table.insert(t,'')
     for str in string.gmatch(response.content, "([^"..sep.."]+)") do
         -- Checks for markdown header characters for section separation

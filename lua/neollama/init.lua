@@ -28,7 +28,7 @@ M.config = {
         },
         position = '50%',
         hl = {
-            title = {link = "String"},
+            title = {link = "Comment"},
             default_border = {link = "FloatBorder"},
             current_border = {link = "Boolean"},
         },
@@ -36,7 +36,7 @@ M.config = {
             hl = {
                 user_header = {link = "Keyword"},
                 model_header = {link = "Keyword"},
-                virtual_text_hl = "Conditional",
+                virtual_text_hl = {link = "Conditional"},
             },
             virtual_text = {"╒", "│", "╘"},
         },
@@ -80,8 +80,8 @@ M.setup = function (user_config)
     vim.api.nvim_set_hl(0, "NeollamaUserHeader", config.layout.popup.hl.user_header)
     vim.api.nvim_set_hl(0, "NeollamaModelHeader", config.layout.popup.hl.model_header)
     vim.api.nvim_set_hl(0, "NeollamaWindowTitle", config.layout.hl.title)
-    vim.api.nvim_set_hl(0, "NeollamaCurrentBorder", config.layout.hl.current_border)
     vim.api.nvim_set_hl(0, "NeollamaDefaultBorder", config.layout.hl.default_border)
+    vim.api.nvim_set_hl(0, "NeollamaChatVirtualText", config.layout.popup.hl.virtual_text_hl)
 end
 
 -- Run the data files through the checker upon initialization

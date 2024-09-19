@@ -151,7 +151,7 @@ M.close_map = function ()
     plugin.active_session = false
 end
 
--- CONFIG HANDLING --
+-- MODEL CONFIG HANDLING --
 
 -- Format the recieved table string back to a lua table seperated by lines
 M.param_format = function (opts)
@@ -473,6 +473,38 @@ M.reformat_session = function (messages)
     end
 
     vim.cmd('normal! G')
+end
+
+-- HIGHLIGHTING --
+
+M.set_user_heading = function (buf, buf_lines)
+    for line_count, line in ipairs(buf_lines) do
+        local start = 1
+        while true do
+            local start_col, end_col = string.find(line, "User: ", start)
+            if start_col then
+                vim.api.nvim_buf_add_highlight(buf, -1, "NeollamaUserHeader", line_count - 1, start_col - 1, end_col)
+                start = end_col + 1
+            else
+                break
+            end
+        end
+    end
+end
+
+M.set_model_heading = function (buf, model, buf_lines)
+    for line_count, line in ipairs(buf_lines) do
+        local start = 1
+        while true do
+            local start_col, end_col = string.find(line, model .. ": ", start)
+            if start_col then
+                vim.api.nvim_buf_add_highlight(buf, -1, "NeollamaModelHeader", line_count - 1, start_col - 1, end_col)
+                start = end_col + 1
+            else
+                break
+            end
+        end
+    end
 end
 
 return M
