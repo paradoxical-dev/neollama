@@ -12,7 +12,7 @@ M.config = {
     hide_cursor = true,
     max_chats = 10,
     params = {
-        model = 'llama3',
+        model = 'llama3:latest',
         stream = false,
         default_options = M.api.default_options,
         extra_opts = M.api.extra_opts
@@ -20,7 +20,6 @@ M.config = {
     layout = {
         border = {
             default = "rounded",
-            current = "rounded",
         },
         size = {
             width = '70%',
@@ -34,8 +33,8 @@ M.config = {
         popup = {
             hl = {
                 user_header = {link = "Keyword"},
-                model_header = {link = "Keyword"},
-                virtual_text_hl = {link = "Conditional"},
+                model_header = {link = "Function"},
+                virtual_text = {link = "Conditional"},
             },
             virtual_text = {"╒", "│", "╘"},
         },
@@ -45,11 +44,12 @@ M.config = {
         },
         model_picker = {
             icon = "",
-            hl = "Keyword"
+            hl = {link = "Keyword"}
         },
         session_picker = {
             icon = "",
-            hl = "Keyword"
+            current_hl = {link = "Keyword"},
+            default_hl = {link = "Comment"}
         }
     },
     keymaps = {
@@ -80,7 +80,10 @@ M.setup = function (user_config)
     vim.api.nvim_set_hl(0, "NeollamaModelHeader", config.layout.popup.hl.model_header)
     vim.api.nvim_set_hl(0, "NeollamaWindowTitle", config.layout.hl.title)
     vim.api.nvim_set_hl(0, "NeollamaDefaultBorder", config.layout.hl.default_border)
-    vim.api.nvim_set_hl(0, "NeollamaChatVirtualText", config.layout.popup.hl.virtual_text_hl)
+    vim.api.nvim_set_hl(0, "NeollamaChatVirtualText", config.layout.popup.hl.virtual_text)
+    vim.api.nvim_set_hl(0, "NeollamaSessionMenuDefault", config.layout.session_picker.default_hl)
+    vim.api.nvim_set_hl(0, "NeollamaSessionMenuCurrent", config.layout.session_picker.current_hl)
+    vim.api.nvim_set_hl(0, "NeollamaModelMenu", config.layout.model_picker.hl)
 end
 
 -- Run the data files through the checker upon initialization

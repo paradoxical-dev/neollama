@@ -2,6 +2,7 @@ local Popup = require('nui.popup')
 local Layout = require('nui.layout')
 local Menu = require('nui.menu')
 local NuiText = require("nui.text")
+local NuiLine = require("nui.line")
 
 local M = {}
 
@@ -408,19 +409,37 @@ M.session_picker = function ()
                 close = {},
                 submit = { "<CR>" }
             },
-            on_change = function(item, menu) -- Used to truncate menu items based on length
+
+            prepare_item = function (item)
+                local line = NuiLine()
+                line:append(item.text, "NeollamaSessionMenuDefault")
+                return line
+            end,
+
+            on_change = function(item, menu)
                 local nodes = menu.tree.nodes.by_id
-
-                local menu_width = math.floor(plugin.layout._.float.container_info.size.width * 0.2)
                 for _, node in pairs(nodes) do
-                    if vim.fn.strdisplaywidth(node.text) >= menu_width then
-                        local short_str = node.text:gsub(1, -3)
-                        node.text = short_str .. '...'
-                    end
-                end
+                    local line = NuiLine()
 
+                    if (node.text or node.text._texts[1]._content) == (item.text or item.text._texts[1]._content) then
+                        if node.text._texts then
+                            line:append(node.text._texts[1]._content, "NeollamaSessionMenuCurrent")
+                        else
+                            line:append(node.text, "NeollamaSessionMenuCurrent")
+                        end
+                    else
+                        if node.text._texts then
+                            line:append(node.text._texts[1]._content, "NeollamaSessionMenuDefault")
+                        else
+                            line:append(node.text, "NeollamaSessionMenuDefault")
+                        end
+                    end
+
+                    node.text = line
+                end
                 menu._tree:render()
             end,
+
             on_submit = function (item)
                 local ok, _ = pcall(vim.api.nvim_set_current_win, M.window_selection[2])
                 if not ok then
@@ -463,11 +482,10 @@ M.model_picker = function ()
     local self = {}
     setmetatable(self, {__index = M})
 
-    local selections = {}   --Used to store full model names for selection of shortened names
+    local current_selection -- holds the value of the current selection
     local function prep(models)
         local t = {}
         for _, model in ipairs(models) do
-            table.insert(selections, model)
             table.insert(t, #t + 1, Menu.item(model))
             table.insert(t, #t + 1, Menu.item(' '))
         end
@@ -508,6 +526,12 @@ M.model_picker = function ()
                 submit = { "<CR>" }
             },
 
+            prepare_item = function (item)
+                local line = NuiLine()
+                line:append(item.text, "NeollamaModelMenu")
+                return line
+            end,
+
             should_skip_item = function(item)
                 if item.text == ' ' then
                     return true
@@ -517,6 +541,7 @@ M.model_picker = function ()
             end,
 
             on_change = function(item, menu)
+                -- Removes icon from previous selection; applies to current selection
                 local nodes = menu.tree.nodes.by_id
                 for _, node in pairs(nodes) do
                     node.text = node.text:gsub("^ " .. plugin.config.layout.model_picker.icon .. " ", "")
@@ -524,32 +549,18 @@ M.model_picker = function ()
                 end
                 item.text = " " .. plugin.config.layout.model_picker.icon .. " " .. item.text
 
-                local menu_width = math.floor(plugin.layout._.float.container_info.size.width * 0.2)
-                if vim.fn.strdisplaywidth(item.text) >= menu_width then
-                    local short_str = item.text:gsub(1, -3)
-                    item.text = short_str .. '...'
-                end
-
                 menu._tree:render()
             end,
 
             on_submit = function (item)
                 vim.schedule(function()
-                    if item.text:match('...') then
-                        local raw_name = item.text:gsub("^ " .. plugin.config.layout.model_picker.icon .. " ", "")
-                        for _, value in ipairs(selections) do
-                            if value:match(raw_name:gsub(1, -3)) then
-                                item.text = value
-                            end
-                        end
-                    end
-
-                    _G.NeollamaModel= item.text:gsub("^ " .. plugin.config.layout.model_picker.icon .. " ", "")
+                    _G.NeollamaModel = current_selection or item.text:gsub("^ " .. plugin.config.layout.model_picker.icon .. " ", "")
                     API.params.model = _G.NeollamaModel
                     API.reset_opts()
 
                     API.model_loaded = false
                     API.model_opts = nil
+                    print("Loading model: " .. _G.NeollamaModel)
                     API.load_model(_G.NeollamaModel)
                     API.get_opts()
 
