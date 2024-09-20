@@ -230,8 +230,12 @@ M.insert_input = function(popup,value)
     local buf = popup.bufnr
     local current_lines = vim.api.nvim_buf_line_count(buf)
 
+    if value.mode and plugin.config.hide_pasted_text then
+        value.content = value.content:gsub("%[%[.*", "")
+    end
+
     local wrapped_lines = {"User:"}
-    local t = utils.line_wrap(value, popup._.size.width - 2)
+    local t = utils.line_wrap(value.content, popup._.size.width - 2)
     for _, line in ipairs(t) do
         table.insert(wrapped_lines, line)
     end
@@ -452,6 +456,7 @@ M.session_picker = function ()
 
                     node.text = line
                 end
+
                 menu._tree:render()
             end,
 

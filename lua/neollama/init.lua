@@ -11,6 +11,7 @@ M.config = {
     autoscroll = true,
     hide_cursor = true,
     max_chats = 10,
+    hide_pasted_text = true,
     params = {
         model = 'llama3:latest',
         stream = false,

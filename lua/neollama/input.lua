@@ -97,6 +97,7 @@ M.new = function ()
                 -- check for visual mode; including the selection if necessary
                 table.insert(API.params.messages, #API.params.messages + 1, {role = "user", content = value})
                 if plugin.mode ~= false then
+                    API.params.messages[#API.params.messages].mode = true
                     API.params.messages[#API.params.messages].content = API.params.messages[#API.params.messages].content .. '\n' .. plugin.mode
                     plugin.mode = false
                 end

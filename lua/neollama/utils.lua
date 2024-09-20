@@ -468,7 +468,7 @@ M.reformat_session = function (messages)
         if message.role ~= "user" and message.role ~= "system" and message.role ~= "tool" then
             LayoutHandler.insert_response(plugin.popup, message)
         elseif message.role == "user" then
-            LayoutHandler.insert_input(plugin.popup, message.content)
+            LayoutHandler.insert_input(plugin.popup, message)
         end
     end
 
