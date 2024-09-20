@@ -47,7 +47,8 @@ M.config = {
             hl = {link = "Keyword"}
         },
         session_picker = {
-            icon = "",
+            default_icon = "󰄰 ",
+            current_icon = "󰄴 ",
             current_hl = {link = "Keyword"},
             default_hl = {link = "Comment"}
         }

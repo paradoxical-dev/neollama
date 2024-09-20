@@ -380,7 +380,7 @@ M.session_picker = function ()
         local t = {}
         for _, session in ipairs(user_data.sessions) do
             table.insert(selections, session)
-            table.insert(t, #t + 1, Menu.item(plugin.config.layout.session_picker.icon .. ' ' .. session))
+            table.insert(t, #t + 1, Menu.item(plugin.config.layout.session_picker.default_icon .. ' ' .. session))
         end
         return t
     end
@@ -418,20 +418,35 @@ M.session_picker = function ()
 
             on_change = function(item, menu)
                 local nodes = menu.tree.nodes.by_id
+                local current_icon = plugin.config.layout.session_picker.current_icon
+                local default_icon = plugin.config.layout.session_picker.default_icon
+
                 for _, node in pairs(nodes) do
                     local line = NuiLine()
 
                     if (node.text or node.text._texts[1]._content) == (item.text or item.text._texts[1]._content) then
                         if node.text._texts then
-                            line:append(node.text._texts[1]._content, "NeollamaSessionMenuCurrent")
+                            local raw_name = node.text._texts[1]._content:gsub(default_icon .. " ", '')
+                            line:append(current_icon .. " " .. raw_name, "NeollamaSessionMenuCurrent")
                         else
-                            line:append(node.text, "NeollamaSessionMenuCurrent")
+                            local raw_name = node.text:gsub(default_icon .. " ", '')
+                            line:append(current_icon .. " " .. raw_name, "NeollamaSessionMenuCurrent")
                         end
                     else
                         if node.text._texts then
-                            line:append(node.text._texts[1]._content, "NeollamaSessionMenuDefault")
+                            if node.text._texts[1]._content:find(current_icon) then
+                                local raw_name = node.text._texts[1]._content:gsub(current_icon .. " ", '')
+                                line:append(default_icon .. " " .. raw_name, "NeollamaSessionMenuDefault")
+                            else
+                                line:append(node.text._texts[1]._content, "NeollamaSessionMenuDefault")
+                            end
                         else
-                            line:append(node.text, "NeollamaSessionMenuDefault")
+                            if node.text:find(current_icon) then
+                                local raw_name = node.text:gsub(current_icon .. " ", '')
+                                line:append(default_icon .. " " .. raw_name, "NeollamaSessionMenuDefault")
+                            else
+                                line:append(node.text, "NeollamaSessionMenuDefault")
+                            end
                         end
                     end
 
