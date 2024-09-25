@@ -425,32 +425,51 @@ M.session_picker = function ()
                 local current_icon = plugin.config.layout.session_picker.current_icon
                 local default_icon = plugin.config.layout.session_picker.default_icon
 
+                -- I'm sorry to whoever is reading this
                 for _, node in pairs(nodes) do
                     local line = NuiLine()
 
                     if (node.text or node.text._texts[1]._content) == (item.text or item.text._texts[1]._content) then
                         if node.text._texts then
-                            local raw_name = node.text._texts[1]._content:gsub(default_icon .. " ", '')
+
+                            local current
+                            if node.text._texts[1]._content:find(current_icon) then
+                                current = current_icon
+                            end
+
+                            local raw_name = node.text._texts[1]._content:gsub(current or default_icon .. " ", '')
                             line:append(current_icon .. " " .. raw_name, "NeollamaSessionMenuCurrent")
+
                         else
-                            local raw_name = node.text:gsub(default_icon .. " ", '')
+
+                            local current
+                            if node.text:find(current_icon) then
+                                current = current_icon
+                            end
+
+                            local raw_name = node.text:gsub(current or default_icon .. " ", '')
                             line:append(current_icon .. " " .. raw_name, "NeollamaSessionMenuCurrent")
+
                         end
                     else
                         if node.text._texts then
+
                             if node.text._texts[1]._content:find(current_icon) then
                                 local raw_name = node.text._texts[1]._content:gsub(current_icon .. " ", '')
                                 line:append(default_icon .. " " .. raw_name, "NeollamaSessionMenuDefault")
                             else
                                 line:append(node.text._texts[1]._content, "NeollamaSessionMenuDefault")
                             end
+
                         else
+
                             if node.text:find(current_icon) then
                                 local raw_name = node.text:gsub(current_icon .. " ", '')
                                 line:append(default_icon .. " " .. raw_name, "NeollamaSessionMenuDefault")
                             else
                                 line:append(node.text, "NeollamaSessionMenuDefault")
                             end
+
                         end
                     end
 
@@ -468,14 +487,12 @@ M.session_picker = function ()
                 end
 
                 vim.schedule(function()
-                    local new_session = item.text:gsub("^" .. plugin.config.layout.session_picker.icon .. " ", "")
-                    if item.text:match('...') then
-                        for _, value in ipairs(selections) do
-                            if value:match(new_session:gsub(1, -3)) then
-                                new_session = value
-                                break
-                            end
-                        end
+                    local new_session
+                    if type(item.text) == "table" then
+                        print('table')
+                        new_session = item.text._texts[1]._content:gsub("^[%s%p" .. plugin.config.layout.session_picker.current_icon .. "]*(%a)", "%1")
+                    else
+                        new_session = item.text:gsub("^[%s%p" .. plugin.config.layout.session_picker.current_icon .. "]*(%a)", "%1")
                     end
 
                     print("Loading  session: " .. new_session)
@@ -564,7 +581,7 @@ M.model_picker = function ()
                 -- Removes icon from previous selection; applies to current selection
                 local nodes = menu.tree.nodes.by_id
                 for _, node in pairs(nodes) do
-                    node.text = node.text:gsub("^ " .. plugin.config.layout.model_picker.icon .. " ", "")
+                    node.text = node.text:gsub("^[%s%p" .. plugin.config.layout.model_picker.icon .. "]*(%a)", "%1")
                     menu._tree:render()
                 end
                 item.text = " " .. plugin.config.layout.model_picker.icon .. " " .. item.text
@@ -574,7 +591,7 @@ M.model_picker = function ()
 
             on_submit = function (item)
                 vim.schedule(function()
-                    _G.NeollamaModel = current_selection or item.text:gsub("^ " .. plugin.config.layout.model_picker.icon .. " ", "")
+                    _G.NeollamaModel = current_selection or item.text:gsub("^[%s%p" .. plugin.config.layout.model_picker.icon .. "]*(%a)", "%1")
                     API.params.model = _G.NeollamaModel
                     API.reset_opts()
 

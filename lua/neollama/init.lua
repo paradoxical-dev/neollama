@@ -91,10 +91,6 @@ end
 -- Run the data files through the checker upon initialization
 M.utils.data_dir_check()
 
--- Initial model loading for quickest response time in default session
-M.api.list_models()
-M.api.get_opts()
-
 -- Ensure session variables are set to default upon loading
 M.active_session = false
 M.active_session_shown = false
@@ -145,43 +141,50 @@ M.initialize = function ()
         local i = M.Input.new()
         M.input = i.input
 
-        -- Initialize menu pickers for session layout
-        M.model_picker = M.Layout.model_picker().menu
-        M.session_picker = M.Layout.session_picker().menu
-
-        --Insert initial window IDs for navigation
-        M.Layout.update_window_selection()
-
         -- Check if local model list is available before initializing layout window
         if M.api.model_list == nil then
 
-            M.utils.setTimeout(1, function ()
+            M.utils.setTimeout(0.25, function ()
 
                 print('Delayed start: Model List')
+
+                -- Initialize menu pickers for session layout
+                M.model_picker = M.Layout.model_picker().menu
+                M.session_picker = M.Layout.session_picker().menu
                 local l = M.Layout.main_layout(M.popup, M.input, M.model_picker, M.session_picker)
 
                 M.layout = l.layout
                 M.layout:mount()
 
+                --Insert initial window IDs for navigation
+                M.Layout.update_window_selection()
             end, function() return M.api.model_list end)
 
         else
-            local l = M.Layout.main_layout(M.popup, M.input, M.model_picker, M.session_picker)
-            M.layout = l.layout
 
+            -- Initialize menu pickers for session layout
+            M.model_picker = M.Layout.model_picker().menu
+            M.session_picker = M.Layout.session_picker().menu
+            local l = M.Layout.main_layout(M.popup, M.input, M.model_picker, M.session_picker)
+
+            M.layout = l.layout
             M.layout:mount()
+
+            --Insert initial window IDs for navigation
+            M.Layout.update_window_selection()
         end
 
+        -- Set keymaps and active session
         M.utils.set_keymaps()
         M.active_session = true
         M.active_session_shown = true
 
     end)
 
-    vim.api.nvim_command("autocmd WinEnter * lua require('neollama.utils').check_window()")
-    vim.api.nvim_command("autocmd VimResized * lua require('neollama.utils').session_resize()")
+    vim.api.nvim_command("autocmd WinEnter * lua require('neollama.utils').check_window()") -- Autocmd for checking against non-neollaa win
+    vim.api.nvim_command("autocmd VimResized * lua require('neollama.utils').session_resize()") -- Autocmd for detecting editor size
     if M.config.hide_cursor then
-        vim.api.nvim_command("autocmd BufEnter * lua require('neollama.utils').hide_cursor()")
+        vim.api.nvim_command("autocmd BufEnter * lua require('neollama.utils').hide_cursor()") -- Autocmd for hiding cursor if option set
     end
 
 end
