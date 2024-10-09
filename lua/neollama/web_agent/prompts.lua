@@ -23,7 +23,6 @@ Otherwise, If the user's input can be answered using static, known information, 
   "needs_web_search": false
 }
 
-Only respond with the provided JSON formatting, Do not include any other keys or values than the provided. Do not include any other text, characters or symbols. Include no newlines in your response.
 ]]
 
 return M
