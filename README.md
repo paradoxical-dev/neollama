@@ -6,12 +6,19 @@ A UI meant for interacting with Ollama models from within Neovim.
 - Session saving and reloading
 - On the fly model configuration
 - Visual selection appended to prompt
+- Built-in web agent
 
 ## Dependencies
 - [nui.nvim](https://github.com/MunifTanjim/nui.nvim)
 - [plenary.nvim](https://github.com/nvim-lua/plenary.nvim)
+- (For web agent) htmlparser
 - (For web agent) [ddgr](https://github.com/jarun/ddgr)
 - (Optional) [NerdFont](https://www.nerdfonts.com/)
+
+To install the `htmlparser` module you can use luarocks:
+```bash
+sudo luarocks install htmlparser
+```
 
 ## Installation
 To install neollama, simply use your prefferred package manager. For example using Lazy:

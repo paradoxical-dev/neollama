@@ -4,6 +4,7 @@ local utils = require("neollama.utils")
 
 local M = {}
 
+-- Prompts the buffer agent to decide whether a web search is needed; provides queries if so
 M.requires_current_data = function(user_prompt)
 	local res
 	local port = "http://localhost:11434/api/chat"
@@ -11,7 +12,7 @@ M.requires_current_data = function(user_prompt)
 		model = "llama3.1", -- replace with configured model,
 		messages = {
 			{ role = "system", content = prompts.requires_current_data },
-			{ role = "user", content = user_prompt },
+			{ role = "user",   content = user_prompt },
 		},
 		format = "json",
 		stream = false,
@@ -39,12 +40,13 @@ M.requires_current_data = function(user_prompt)
 				res = vim.json.decode(raw_response.message.content)
 				M.web_search = res
 			else
-				print("Curl command failed with exit code: ", return_val)
+				print("curl command failed with exit code: ", return_val)
 			end
 		end,
 	}):start()
 end
 
+-- Uses the ddgr command to find the top search results for the passed query
 M.generate_search_results = function(query)
 	job:new({
 		command = "ddgr",
@@ -57,7 +59,6 @@ M.generate_search_results = function(query)
 			if return_val == 0 then
 				local result = j:result()
 				local json_resp = vim.json.decode(table.concat(result, "\n"))
-				M.web_search = json_resp
 				print(vim.inspect(json_resp))
 			else
 				print("ddgr command failed with exit code: ", return_val)
@@ -65,6 +66,24 @@ M.generate_search_results = function(query)
 		end,
 	}):start()
 end
-M.generate_search_results("What is the current weather in London?")
+
+-- M.requires_current_data("What is the current price of Ethereum?")
+-- if M.web_search then
+-- 	if M.web_search.needs_web_search then
+-- 		M.generate_search_results(M.web_search.queries[1])
+-- 	else
+-- 		print("No web search needed")
+-- 	end
+-- else
+-- 	utils.setTimeout(0.2, function()
+-- 		if M.web_search.needs_web_search then
+-- 			M.generate_search_results(M.web_search.queries[1])
+-- 		else
+-- 			print("No web search needed")
+-- 		end
+-- 	end, function()
+-- 		return M.web_search
+-- 	end)
+-- end
 
 return M
