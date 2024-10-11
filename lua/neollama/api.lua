@@ -170,7 +170,7 @@ end
 
 -- Provides an empty request to the designated model upon startup to inprove response times
 M.load_model = function(model)
-	local port = "http://localhost:11434/api/generate" -- Local port where Ollama API is hosted
+	local port = plugin.config.local_port .. "/generate"
 	local params = {
 		model = model,
 	}
@@ -203,7 +203,7 @@ end
 
 -- Generate a list of all available local models
 M.list_models = function()
-	local port = "http://localhost:11434/api/tags" -- Local port where Ollama API is hosted
+	local port = plugin.config.local_port .. "/tags"
 	local args = {
 		"--silent",
 		"--show-error",
@@ -243,7 +243,7 @@ end
 
 -- Grabs and recontructs the params of the current model into a lua table before updating the current opts using the `insert_model_opts` callback
 M.get_opts = function()
-	local port = "http://localhost:11434/api/show"
+	local port = plugin.config.local_port .. "/show"
 	local params = { name = _G.NeollamaModel }
 	job:new({
 		command = "curl",
@@ -285,9 +285,9 @@ M.get_opts = function()
 				elseif param == "stop" then
 					table.insert(constructed_params.stop, vals[i + 1])
 				elseif
-					constructed_params[vals[i - 1]] == param
-					or vals[i - 1] == "stop"
-					or constructed_params[vals[i - 1]] == tonumber(param)
+						constructed_params[vals[i - 1]] == param
+						or vals[i - 1] == "stop"
+						or constructed_params[vals[i - 1]] == tonumber(param)
 				then
 					goto continue
 				elseif i == #vals - 2 or vals[i + 1] == nil then
@@ -349,7 +349,7 @@ end
 --[[ Creates and executes a job using the curl command,
 passes in API request body with additional arguments ]]
 M.ollamaCall = function()
-	local port = "http://localhost:11434/api/chat" -- Local port where Ollama API is hosted
+	local port = plugin.config.local_port .. "/chat"
 
 	local args = {
 		"--silent",

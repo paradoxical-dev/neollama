@@ -242,11 +242,12 @@ M.insert_input = function(popup, value)
 	local buf = popup.bufnr
 	local current_lines = vim.api.nvim_buf_line_count(buf)
 
+	-- Removes appended visual selection from view
 	if value.mode and plugin.config.hide_pasted_text then
 		value.content = value.content:gsub("%[%[.*", "")
 	end
 
-	local wrapped_lines = { "User:" }
+	local wrapped_lines = {}
 	local t = utils.line_wrap(value.content, popup._.size.width - 2)
 	for _, line in ipairs(t) do
 		table.insert(wrapped_lines, line)
@@ -254,9 +255,24 @@ M.insert_input = function(popup, value)
 	table.insert(wrapped_lines, "")
 
 	if current_lines <= 1 then
-		vim.api.nvim_buf_set_lines(buf, 0, -1, false, wrapped_lines)
+		vim.api.nvim_buf_set_lines(buf, 0, -1, false, { "User:", "" })
 	else
-		vim.api.nvim_buf_set_lines(buf, current_lines + 1, -1, false, wrapped_lines)
+		vim.api.nvim_buf_set_lines(buf, current_lines + 1, -1, false, { "User:", "" })
+	end
+
+	for index, line in ipairs(wrapped_lines) do
+		local text = NuiText(line, "NeollamaUserInput")
+		if index == 1 then
+			-- current_lines = current_lines + 1
+			current_lines = vim.api.nvim_buf_line_count(buf)
+		end
+
+		text:render(buf, -1, current_lines, 0, current_lines, 0)
+		if index < #wrapped_lines then
+			vim.api.nvim_buf_set_lines(buf, current_lines + 1, -1, false, { "" })
+		end
+
+		current_lines = current_lines + 1
 	end
 
 	utils.set_user_heading(buf, vim.api.nvim_buf_get_lines(buf, 0, -1, false))
@@ -501,7 +517,7 @@ M.session_picker = function()
 					)
 				else
 					new_session =
-						item.text:gsub("^[%s%p" .. plugin.config.layout.session_picker.current_icon .. "]*(%a)", "%1")
+							item.text:gsub("^[%s%p" .. plugin.config.layout.session_picker.current_icon .. "]*(%a)", "%1")
 				end
 
 				print("Loading  session: " .. new_session)
@@ -603,7 +619,7 @@ M.model_picker = function()
 		on_submit = function(item)
 			vim.schedule(function()
 				_G.NeollamaModel = current_selection
-					or item.text:gsub("^[%s%p" .. plugin.config.layout.model_picker.icon .. "]*(%a)", "%1")
+						or item.text:gsub("^[%s%p" .. plugin.config.layout.model_picker.icon .. "]*(%a)", "%1")
 				API.params.model = _G.NeollamaModel
 				API.reset_opts()
 

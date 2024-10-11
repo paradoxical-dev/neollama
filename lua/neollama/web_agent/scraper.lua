@@ -1,8 +1,11 @@
 local gumbo = require("gumbo")
 local job = require("plenary.job")
-local utils = require("neollama.utils")
+local plugin = require("neollama.init")
 
 local M = {}
+
+-- Stores the current attempt | Is reset on success
+M.retry_count = 1
 
 local function is_visible_tag(tag)
   local visible_tags = {
@@ -68,7 +71,7 @@ local function clean_text(content)
   for word in shrunk_text:gmatch("%S+") do
     table.insert(split_text, word)
     -- Context limit
-    if #split_text > 4000 then
+    if #split_text > plugin.config.web_agent.content_limit then
       break
     end
   end
@@ -85,7 +88,7 @@ local function request_site(url, cb)
     "--url",
     url,
     "--header",
-    "User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36",
+    "User-Agent: " .. plugin.config.web_agent.user_agent,
     "--header",
     "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
     "--header",
@@ -97,7 +100,7 @@ local function request_site(url, cb)
     "--header",
     "Upgrade-Insecure-Requests: 1",
     "--max-time",
-    "15",
+    plugin.config.web_agent.timeout,
   }
 
   job:new({
@@ -114,9 +117,20 @@ local function request_site(url, cb)
         local dirty_text = extract_text(document.body)
         local cleaned_text = clean_text(dirty_text)
 
+        M.retry_count = 1
         cb(cleaned_text)
       else
-        print("Curl command failed with exit code: ", return_val)
+        print(
+          "Curl command failed with exit code: ",
+          return_val .. "\nResponse: " .. table.concat(j:result(), "\n")
+        )
+        print("Retrying...")
+        M.retry_count = M.retry_count + 1
+        if M.retry_count <= plugin.config.web_agent.retry_count then
+          request_site(url, cb)
+        else
+          print("Failed to scrape website: " .. url)
+        end
       end
     end,
   }):start()
@@ -157,7 +171,7 @@ M.scrape_website_content = function(website_url, failed_sites, cb)
 end
 
 -- test usage
-M.scrape_website_content("https://craigbarnes.gitlab.io/lua-gumbo/", {}, function(status)
+M.scrape_website_content("https://github.com/jaredonnell/neollama", {}, function(status)
   if status then
     print("Found website content: ", status.source)
     print("Website content: ", status.content)

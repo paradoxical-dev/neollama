@@ -1,15 +1,21 @@
 local job = require("plenary.job")
 local prompts = require("neollama.web_agent.prompts")
 local utils = require("neollama.utils")
+local plugin = require("neollama.init")
 
 local M = {}
 
 -- Prompts the buffer agent to decide whether a web search is needed; provides queries if so
 M.requires_current_data = function(user_prompt)
 	local res
-	local port = "http://localhost:11434/api/chat"
+	local model
+	if not plugin.config.web_agent.use_current then
+		model = plugin.config.web_agent.buffer_agent
+	end
+
+	local port = plugin.config.local_port .. "/chat"
 	local params = {
-		model = "llama3.1", -- replace with configured model,
+		model = model or _G.NeollamaModel, -- replace with configured model,
 		messages = {
 			{ role = "system", content = prompts.requires_current_data },
 			{ role = "user",   content = user_prompt },
