@@ -62,7 +62,18 @@ end
 -- test usage
 M.buffer_agent("What is the current price of Ethereum?", function(res)
 	if res.needs_web_search then
-		scraper.generate_search_results(res.queries[1])
+		scraper.generate_search_results(res.queries[1], function(search_results)
+			scraper.scrape_website_content(search_results[2].url, {}, function(status)
+				if status then
+					print("Web search succeeded: ", status.content)
+					print("Source: ", status.source)
+					print(vim.inspect(status))
+				else
+					print("Web search failed")
+					print(vim.inspect(status))
+				end
+			end)
+		end)
 	else
 		print("No web search needed")
 	end
