@@ -41,19 +41,15 @@ end
 -- Recursivley parses the passed HTML body and returns the text
 local function extract_text(node)
   if node.type == "element" and (node.tagName == "SCRIPT" or node.tagName == "STYLE") then
-    print("Skipping script or style element")
     return ""
   end
 
   if node.type == "text" then
-    print("Found text node:", node.data)
     return node.data
   end
 
   local text = {}
-  print(node.tagName)
   if (node.type == "element" and is_visible_tag(node.tagName:lower())) or node.tagName == "BODY" then
-    print("Found visible tag:", node.tagName)
     for _, child in ipairs(node.childNodes) do
       table.insert(text, extract_text(child))
     end
@@ -129,7 +125,8 @@ local function request_site(url, cb)
         if M.retry_count <= plugin.config.web_agent.retry_count then
           request_site(url, cb)
         else
-          print("Failed to scrape website: " .. url)
+          print("Failed to scrape website: " .. url .. " after " .. M.retry_count .. " retries")
+          M.retry_count = 1
         end
       end
     end,
@@ -171,14 +168,14 @@ M.scrape_website_content = function(website_url, failed_sites, cb)
 end
 
 -- test usage
-M.scrape_website_content("https://github.com/jaredonnell/neollama", {}, function(status)
-  if status then
-    print("Found website content: ", status.source)
-    print("Website content: ", status.content)
-  else
-    print("Failed to find website content")
-  end
-end)
+-- M.scrape_website_content("https://github.com/jaredonnell/neollama", {}, function(status)
+--   if status then
+--     print("Found website content: ", status.source)
+--     print("Website content: ", status.content)
+--   else
+--     print("Failed to find website content")
+--   end
+-- end)
 
 -- Uses the ddgr command to find the top search results for the passed query
 M.generate_search_results = function(query)
