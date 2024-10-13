@@ -180,4 +180,25 @@ M.scrape_website_content("https://github.com/jaredonnell/neollama", {}, function
   end
 end)
 
+-- Uses the ddgr command to find the top search results for the passed query
+M.generate_search_results = function(query)
+  job:new({
+    command = "ddgr",
+    args = {
+      "--json",
+      query,
+    },
+    cwd = "/usr/bin",
+    on_exit = function(j, return_val)
+      if return_val == 0 then
+        local result = j:result()
+        local json_resp = vim.json.decode(table.concat(result, "\n"))
+        print(vim.inspect(json_resp))
+      else
+        print("ddgr command failed with exit code: ", return_val)
+      end
+    end,
+  }):start()
+end
+
 return M

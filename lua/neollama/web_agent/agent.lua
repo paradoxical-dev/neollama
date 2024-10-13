@@ -6,7 +6,7 @@ local plugin = require("neollama.init")
 local M = {}
 
 -- Prompts the buffer agent to decide whether a web search is needed; provides queries if so
-M.requires_current_data = function(user_prompt)
+M.buffer_agent = function(user_prompt)
 	local res
 	local model
 	if not plugin.config.web_agent.use_current then
@@ -15,7 +15,7 @@ M.requires_current_data = function(user_prompt)
 
 	local port = plugin.config.local_port .. "/chat"
 	local params = {
-		model = model or _G.NeollamaModel, -- replace with configured model,
+		model = model or _G.NeollamaModel,
 		messages = {
 			{ role = "system", content = prompts.requires_current_data },
 			{ role = "user",   content = user_prompt },
@@ -47,27 +47,6 @@ M.requires_current_data = function(user_prompt)
 				M.web_search = res
 			else
 				print("curl command failed with exit code: ", return_val)
-			end
-		end,
-	}):start()
-end
-
--- Uses the ddgr command to find the top search results for the passed query
-M.generate_search_results = function(query)
-	job:new({
-		command = "ddgr",
-		args = {
-			"--json",
-			query,
-		},
-		cwd = "/usr/bin",
-		on_exit = function(j, return_val)
-			if return_val == 0 then
-				local result = j:result()
-				local json_resp = vim.json.decode(table.concat(result, "\n"))
-				print(vim.inspect(json_resp))
-			else
-				print("ddgr command failed with exit code: ", return_val)
 			end
 		end,
 	}):start()
