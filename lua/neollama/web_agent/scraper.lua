@@ -6,6 +6,7 @@ local M = {}
 
 -- Stores the current attempt | Is reset on success
 M.retry_count = 1
+M.failed_sites = {}
 
 local function is_visible_tag(tag)
 	local visible_tags = {

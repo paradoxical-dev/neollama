@@ -134,4 +134,8 @@ Example configuration:
 
 ## Web Agent
 
+### Overview
+
+The web agent is created using sequential model calls with predefined perameters and System prompts
+
 ## Contributing
