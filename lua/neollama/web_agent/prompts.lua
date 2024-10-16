@@ -69,7 +69,7 @@ end
 M.compile_info = function(user_input)
 	local prompt = [[
   You are tasked with compiling information from a website based on the user's input. The user's input was: "]] .. user_input .. [[
-  Provide only the compiled information with no other context. Do not alter the indformation, only including snippets of the relevant inforamtion in its original order
+  You will be given the content of the website. Provide only the compiled information with no other context. Do not alter the provided information, only including snippets of the relevant points and facts in its original order
   ]]
 	return prompt
 end

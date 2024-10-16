@@ -24,7 +24,7 @@ M.buffer_agent = function(user_prompt, cb)
 		model = model or _G.NeollamaModel,
 		messages = {
 			{ role = "system", content = prompts.requires_current_data },
-			{ role = "user",   content = user_prompt },
+			{ role = "user", content = user_prompt },
 		},
 		format = "json",
 		stream = false,
@@ -75,7 +75,7 @@ M.integration_agent = function(user_prompt, site_content)
 		model = model or _G.NeollamaModel,
 		messages = {
 			{ role = "system", content = prompts.integration_prompt(user_prompt) },
-			{ role = "user",   content = site_content },
+			{ role = "user", content = site_content },
 		},
 		stream = plugin.config.params.stream,
 	}
@@ -126,7 +126,7 @@ M.site_select = function(user_prompt, search_results, cb)
 		model = model or _G.NeollamaModel,
 		messages = {
 			{ role = "system", content = prompts.site_select(user_prompt) },
-			{ role = "user",   content = search_results },
+			{ role = "user", content = search_results },
 		},
 		stream = false,
 	}
@@ -176,9 +176,12 @@ M.compilation_agent = function(user_prompt, content)
 		model = model or _G.NeollamaModel,
 		messages = {
 			{ role = "system", content = prompts.compile_info(user_prompt) },
-			{ role = "user",   content = content },
+			{ role = "user", content = content },
 		},
 		stream = false,
+		options = {
+			num_ctx = 4096,
+		},
 	}
 	local args = {
 		"--silent",
@@ -226,7 +229,7 @@ M.res_check_agent = function(user_prompt, response)
 		model = model or _G.NeollamaModel,
 		messages = {
 			{ role = "system", content = prompts.response_checker_prompt(user_prompt) },
-			{ role = "user",   content = response },
+			{ role = "user", content = response },
 		},
 		format = "json",
 		stream = false,
