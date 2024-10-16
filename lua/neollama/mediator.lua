@@ -13,7 +13,7 @@ M.setup = function(api, layout, input, util, init, agent, scraper)
 	input.set_api(api)
 	input.set_layout_handler(layout)
 	input.set_plugin(init)
-	input.set_agent(agent, scraper)
+	input.set_agent(agent)
 
 	util.set_plugin(init)
 	util.set_layout_handler(layout)

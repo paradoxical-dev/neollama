@@ -23,9 +23,8 @@ M.set_plugin = function(init)
 	plugin = init
 end
 
-M.set_agent = function(agent, web_scraper)
+M.set_agent = function(agent)
 	web_agent = agent
-	scraper = web_scraper
 end
 
 M.new = function()
@@ -142,30 +141,32 @@ M.new = function()
 			end, 0)
 
 			-- TODO: Need to split this into separate functions. Ideally one for determinig the web search and another for the usage
+			-- INFO: Separated the loop structure into the `feedback_loop` function
+			-- WARN: This function and its implementation is yet to be tested
 			if plugin.config.web_agent.enabled then
-				print("Using web agent")
-				web_agent.buffer_agent(value, function(res)
-					if res.needs_web_search then
-						print("web search needed")
-						scraper.generate_search_results(res.queries[1], function(search_results)
-							print("got search results")
-							web_agent.site_select(value, search_results, function(url)
-								print("got url: " .. url)
-								scraper.scrape_website_content(url, scraper.failed_sites, function(status)
-									print("got content")
-									print(status.content)
-									if not status then
-										print("failed to get content")
-									end
-									web_agent.compilation_agent(value, status.content)
-								end)
-							end)
-						end)
-					else
-						print("we dont need it")
-					end
-				end)
-				return
+				-- print("Using web agent")
+				-- web_agent.buffer_agent(value, function(res)
+				-- 	if res.needs_web_search then
+				-- 		print("web search needed")
+				-- 		scraper.generate_search_results(res.queries[1], function(search_results)
+				-- 			print("got search results")
+				-- 			web_agent.site_select(value, search_results, function(url)
+				-- 				print("got url: " .. url)
+				-- 				scraper.scrape_website_content(url, scraper.failed_sites, function(status)
+				-- 					print("got content")
+				-- 					print(status.content)
+				-- 					if not status then
+				-- 						print("failed to get content")
+				-- 					end
+				-- 					web_agent.compilation_agent(value, status.content)
+				-- 				end)
+				-- 			end)
+				-- 		end)
+				-- 	else
+				-- 		print("we dont need it")
+				-- 	end
+				-- end)
+				-- return
 			end
 
 			-- check if model is loaded before calling ollama client

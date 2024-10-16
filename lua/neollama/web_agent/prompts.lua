@@ -34,32 +34,36 @@ M.integration_prompt = function(input)
 	return prompt
 end
 
-M.response_checker_prompt = function(user_input)
+M.response_checker_prompt = function(user_input, content)
 	local prompt = [[
-  You are tasked with evaluating the response from an integration agent to ensure it adequately answers the user's query. The user's input was: "]] .. user_input .. [["
+  You are an AI agent responsible for assessing whether the provided information is sufficient to fully and accurately answer the user's prompt. Your task is to determine if all relevant aspects of the user's query can be addressed using the given content. If the provided information is enough, return a JSON object with `"res_passed": true`. If not, return `"res_passed": false`.
 
-  The integration agent's resposne will be provided to you.
+  Here is the user's prompt: "]] .. user_input .. [["
 
-  Your job is to verify if the response addresses all relevant aspects of the user's input. If the response is sufficient and fully addresses the input, return the following JSON structure:
+  And here is the provided information:
+  "]] .. content .. [["
+
+  Analyze the content to decide if it is adequate to answer the user's query completely. Return your result in the following JSON format:
   {
     "res_passed": true
   }
 
-  If the response is missing information or does not adequately address key parts of the user's query, return the following JSON structure:
-  {
-    "res_passed": false,
-    "info_needed": [<list the key aspects of the user's input that were not addressed>],
-    "queries": [<list any follow-up queries or clarifications needed to improve the response>]
-  }
+  or
 
-  Ensure your evaluation is accurate, concise, and provides constructive feedback where necessary.
+  {
+    "res_passed": false
+  }
   ]]
 	return prompt
 end
 
-M.site_select = function(user_input)
+M.site_select = function(user_input, failed_sites)
 	local prompt = [[
   You are tasked with selecting a website from a list of websites based on the user's input. The user's input was: "]] .. user_input .. [[
+  Ensure the chosen URL does not match any of the following websites which have been maked as failed sites: ]] .. table.concat(
+		failed_sites,
+		"\n"
+	) .. [[
   Provide only the chosen website URL with no other information or context
   ]]
 

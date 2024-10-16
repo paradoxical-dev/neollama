@@ -1,6 +1,6 @@
 local job = require("plenary.job")
 local prompts = require("neollama.web_agent.prompts")
--- local scraper = require("neollama.web_agent.scraper")
+local scraper = require("neollama.web_agent.scraper")
 
 local M = {}
 
@@ -63,6 +63,8 @@ M.buffer_agent = function(user_prompt, cb)
 	}):start()
 end
 
+-- Creates the final response to the users input using the compiled information from the feedback loop
+-- Will be treated the same as the standard Ollama call with its final response appended to the chat history
 M.integration_agent = function(user_prompt, site_content)
 	local res
 	local model
@@ -114,7 +116,9 @@ M.integration_agent = function(user_prompt, site_content)
 	}):start()
 end
 
-M.site_select = function(user_prompt, search_results, cb)
+-- Selects the best url from the search results using the titles and descriptions
+-- Returns the selected url
+M.site_select = function(user_prompt, search_results, failed_sites, cb)
 	local res
 	local model
 	if not plugin.config.web_agent.use_current then
@@ -125,7 +129,7 @@ M.site_select = function(user_prompt, search_results, cb)
 	local params = {
 		model = model or _G.NeollamaModel,
 		messages = {
-			{ role = "system", content = prompts.site_select(user_prompt) },
+			{ role = "system", content = prompts.site_select(user_prompt, failed_sites) },
 			{ role = "user", content = search_results },
 		},
 		stream = false,
@@ -164,7 +168,8 @@ M.site_select = function(user_prompt, search_results, cb)
 	}):start()
 end
 
-M.compilation_agent = function(user_prompt, content)
+-- Compiles the scrpaed content to only include relevant information
+M.compilation_agent = function(user_prompt, content, cb)
 	local res
 	local model
 	if not plugin.config.web_agent.use_current then
@@ -210,14 +215,17 @@ M.compilation_agent = function(user_prompt, content)
 
 				res = raw_response.message.content
 				print("Compiled Response: ", vim.inspect(res))
+				cb(res)
 			else
-				print("curl command failed with exit code: ", return_val)
+				print("Curl command failed with exit code: ", return_val)
 			end
 		end,
 	}):start()
 end
 
-M.res_check_agent = function(user_prompt, response)
+-- Decides if the scraped content is enough to answer the user input
+-- Will be used in the feedback loop to continue the compilation of information using other queries
+M.res_check_agent = function(user_prompt, content, cb)
 	local res
 	local model
 	if not plugin.config.web_agent.use_current then
@@ -228,11 +236,14 @@ M.res_check_agent = function(user_prompt, response)
 	local params = {
 		model = model or _G.NeollamaModel,
 		messages = {
-			{ role = "system", content = prompts.response_checker_prompt(user_prompt) },
-			{ role = "user", content = response },
+			{ role = "system", content = prompts.response_checker_prompt(user_prompt, content) },
+			-- { role = "user", content = response },
 		},
 		format = "json",
 		stream = false,
+		options = {
+			num_ctx = 4096,
+		},
 	}
 	local args = {
 		"--silent",
@@ -261,11 +272,58 @@ M.res_check_agent = function(user_prompt, response)
 
 				res = vim.json.decode(raw_response.message.content)
 				print("Review Response: ", vim.inspect(res))
+				cb(res)
 			else
 				print("curl command failed with exit code: ", return_val)
 			end
 		end,
 	}):start()
+end
+
+-- Stores the current query index and compiled information for the feedback loop
+M.query_index = 1
+M.compiled_information = [[]]
+
+-- Combines the agent calls to simulate a feedback loop
+-- Reruns the function in the case that the information is inadequate or the chose site failed
+M.feedback_loop = function(value, res)
+	scraper.generate_search_results(res.queries[M.query_index], function(search_results)
+		M.site_select(value, search_results, scraper.failed_sites, function(url)
+			for _, site in ipairs(scraper.failed_sites) do
+				if url == site then
+					if M.query_index <= #res.queries then
+						M.query_index = M.query_index + 1
+						M.feedback_loop(value, res)
+					end
+					return
+				end
+			end
+			scraper.scrape_website_content(url, scraper.failed_sites, function(status)
+				if not status then
+					print("failed to get content")
+					if M.query_index <= #res.queries then
+						M.query_index = M.query_index + 1
+						M.feedback_loop(value, res)
+					end
+				else
+					M.compilation_agent(value, status.content, function(compiled_information)
+						M.compiled_information = M.compiled_information .. compiled_information
+						M.res_check_agent(value, M.compiled_information, function(check)
+							if check.res_passed then
+								print("information is good")
+							else
+								print("information is bad")
+								if M.query_index <= #res.queries then
+									M.query_index = M.query_index + 1
+									M.feedback_loop(value, res)
+								end
+							end
+						end)
+					end)
+				end
+			end)
+		end)
+	end)
 end
 
 return M
