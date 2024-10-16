@@ -66,4 +66,12 @@ M.site_select = function(user_input)
 	return prompt
 end
 
+M.compile_info = function(user_input)
+	local prompt = [[
+  You are tasked with compiling information from a website based on the user's input. The user's input was: "]] .. user_input .. [[
+  Provide only the compiled information with no other context. Do not alter the indformation, only including snippets of the relevant inforamtion in its original order
+  ]]
+	return prompt
+end
+
 return M

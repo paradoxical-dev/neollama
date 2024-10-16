@@ -1,12 +1,15 @@
 local Input = require("nui.input")
 local utils = require("neollama.utils")
 local NuiText = require("nui.text")
+-- local web_agent = require("neollama.web_agent")
 
 local M = {}
 
 local API
 local LayoutHandler
 local plugin
+local web_agent
+local scraper
 
 M.set_api = function(api)
 	API = api
@@ -18,6 +21,11 @@ end
 
 M.set_plugin = function(init)
 	plugin = init
+end
+
+M.set_agent = function(agent, web_scraper)
+	web_agent = agent
+	scraper = web_scraper
 end
 
 M.new = function()
@@ -42,6 +50,7 @@ M.new = function()
 		default_value = nil,
 		on_close = function() end,
 		on_submit = function(value) -- Inserts user input accordingly while calling the ollama client with the user input
+			-- handle save command
 			if value == "/s" then
 				plugin.layout:hide()
 
@@ -59,6 +68,7 @@ M.new = function()
 				return
 			end
 
+			-- handle config editor command
 			if value == "/c" then
 				plugin.layout:hide()
 
@@ -99,8 +109,9 @@ M.new = function()
 				LayoutHandler.remount()
 			end
 
-			-- check for visual mode; including the selection if necessary
+			-- insert input to chat history
 			table.insert(API.params.messages, #API.params.messages + 1, { role = "user", content = value })
+			-- check for visual mode including the selection if necessary
 			if plugin.mode ~= false then
 				API.params.messages[#API.params.messages].mode = true
 				API.params.messages[#API.params.messages].content = API.params.messages[#API.params.messages].content
@@ -130,6 +141,32 @@ M.new = function()
 				end
 			end, 0)
 
+			-- TODO: Need to split this into separate functions. Ideally one for determinig the web search and another for the usage
+			if plugin.config.web_agent.enabled then
+				-- print("Using web agent")
+				-- web_agent.buffer_agent(value, function(res)
+				-- 	if res.needs_web_search then
+				-- 		print("web search needed")
+				-- 		scraper.generate_search_results(res.queries[1], function(search_results)
+				-- 			print("got search results")
+				-- 			web_agent.site_select(value, search_results, function(url)
+				-- 				print("got url: " .. url)
+				-- 				scraper.scrape_website_content(url, scraper.failed_sites, function(status)
+				-- 					print("got content")
+				-- 					if not status then
+				--
+				-- 					end
+				-- 					web_agent.compilation_agent(value, status.content)
+				-- 				end)
+				-- 			end)
+				-- 		end)
+				-- 	else
+				-- 		print("we dont need it")
+				-- 	end
+				-- end)
+				-- return
+			end
+
 			-- check if model is loaded before calling ollama client
 			if API.model_loaded then
 				API.ollamaCall()
@@ -142,7 +179,7 @@ M.new = function()
 				end)
 			end
 
-			-- check if full response has been generated before showing input
+			-- check if full response has been generated before showing input window
 			if API.done then
 				vim.schedule(function()
 					LayoutHandler.show_input()

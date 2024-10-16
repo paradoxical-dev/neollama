@@ -5,7 +5,9 @@ M.Layout = require("neollama.layout")
 M.Input = require("neollama.input")
 M.api = require("neollama.api")
 M.mediator = require("neollama.mediator")
-M.mediator.setup(M.api, M.Layout, M.Input, M.utils, M)
+M.web_agent = require("neollama.web_agent.agent")
+M.web_scraper = require("neollama.web_agent.scraper")
+M.mediator.setup(M.api, M.Layout, M.Input, M.utils, M, M.web_agent, M.web_scraper)
 
 M.config = {
 	autoscroll = true,
@@ -21,8 +23,7 @@ M.config = {
 	},
 	web_agent = {
 		enabled = true,
-		user_agent =
-		"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36",
+		user_agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36",
 		timeout = 15,
 		content_limit = 4000,
 		retry_count = 3,
@@ -194,10 +195,10 @@ M.initialize = function()
 		M.active_session_shown = true
 	end)
 
-	vim.api.nvim_command("autocmd WinEnter * lua require('neollama.utils').check_window()")    -- Autocmd for checking against non-neollaa win
+	vim.api.nvim_command("autocmd WinEnter * lua require('neollama.utils').check_window()") -- Autocmd for checking against non-neollaa win
 	vim.api.nvim_command("autocmd VimResized * lua require('neollama.utils').session_resize()") -- Autocmd for detecting editor size
 	if M.config.hide_cursor then
-		vim.api.nvim_command("autocmd BufEnter * lua require('neollama.utils').hide_cursor()")   -- Autocmd for hiding cursor if option set
+		vim.api.nvim_command("autocmd BufEnter * lua require('neollama.utils').hide_cursor()") -- Autocmd for hiding cursor if option set
 	end
 end
 

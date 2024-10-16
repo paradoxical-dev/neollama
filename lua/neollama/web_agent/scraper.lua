@@ -1,8 +1,60 @@
 local gumbo = require("gumbo")
 local job = require("plenary.job")
-local plugin = require("neollama.init")
+-- local plugin = require("neollama.init")
 
 local M = {}
+local plugin
+
+M.set_plugin = function(init)
+	plugin = init
+end
+
+-- Makes the search results readable for ollama
+local function format_search_results(search_results)
+	local formatted = [[]]
+	for index, value in ipairs(search_results) do
+		formatted = formatted
+				.. "\n\n"
+				.. "Option "
+				.. index
+				.. ": "
+				.. "\n"
+				.. "Title: "
+				.. value.title
+				.. "\n"
+				.. "Description: "
+				.. value.abstract
+				.. "\n"
+				.. "URL: "
+				.. value.url
+	end
+
+	return formatted
+end
+
+-- Uses the ddgr command to find the top search results for the passed query
+-- Callback is used to handle the returned data
+M.generate_search_results = function(query, cb)
+	job:new({
+		command = "ddgr",
+		args = {
+			"--json",
+			query,
+		},
+		cwd = "/usr/bin",
+		on_exit = function(j, return_val)
+			if return_val == 0 then
+				local result = j:result()
+				local json_resp = vim.json.decode(table.concat(result, "\n"))
+				local formatted = format_search_results(json_resp)
+
+				cb(formatted)
+			else
+				print("ddgr command failed with exit code: ", return_val, "\nError: " .. table.concat(j:result(), "\n"))
+			end
+		end,
+	}):start()
+end
 
 -- Stores the current attempt | Is reset on success
 M.retry_count = 1
@@ -167,39 +219,6 @@ M.scrape_website_content = function(website_url, failed_sites, cb)
 
 		cb(status)
 	end)
-end
-
--- test usage
--- M.scrape_website_content("https://www.coindesk.com/price/ethereum", {}, function(status)
---   if status then
---     print("Found website content: ", status.source)
---     print("Website content: ", status.content)
---   else
---     print("Failed to find website content")
---   end
--- end)
-
--- Uses the ddgr command to find the top search results for the passed query
--- Callback is used to handle the returned data
-M.generate_search_results = function(query, cb)
-	local json_resp
-	job:new({
-		command = "ddgr",
-		args = {
-			"--json",
-			query,
-		},
-		cwd = "/usr/bin",
-		on_exit = function(j, return_val)
-			if return_val == 0 then
-				local result = j:result()
-				json_resp = vim.json.decode(table.concat(result, "\n"))
-				cb(json_resp)
-			else
-				print("ddgr command failed with exit code: ", return_val)
-			end
-		end,
-	}):start()
 end
 
 return M
