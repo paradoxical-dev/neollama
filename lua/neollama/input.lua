@@ -27,6 +27,56 @@ M.set_agent = function(agent)
 	web_agent = agent
 end
 
+-- Call the necessary functions to update the UI and set the api state
+local function ui_update()
+	vim.schedule(function()
+		LayoutHandler.show_input()
+		LayoutHandler.update_window_selection()
+	end, 0)
+
+	vim.schedule(function()
+		utils.reformat_session(API.params.messages)
+	end, 0)
+
+	utils.setTimeout(0.25, function()
+		vim.api.nvim_set_current_win(plugin.input.winid)
+	end)
+
+	API.done = false
+end
+
+-- The set of functions for the standard model call
+local function model_call()
+	-- check if model is loaded before calling ollama client
+	if API.model_loaded then
+		API.ollamaCall()
+	else
+		utils.setTimeout(0.25, function()
+			print("Delayed start: Model loading")
+			API.ollamaCall()
+		end, function()
+			return API.model_loaded
+		end)
+	end
+
+	-- check if full response has been generated before updating the UI
+	if API.done then
+		ui_update()
+	else
+		utils.setTimeout(0.5, function()
+			ui_update()
+		end, function()
+			return API.done
+		end)
+	end
+
+	-- update the window selection and reset session keymaps
+	vim.schedule(function()
+		LayoutHandler.update_window_selection()
+		utils.set_keymaps()
+	end)
+end
+
 M.new = function()
 	local self = {}
 	setmetatable(self, { __index = M })
@@ -114,12 +164,12 @@ M.new = function()
 			if plugin.mode ~= false then
 				API.params.messages[#API.params.messages].mode = true
 				API.params.messages[#API.params.messages].content = API.params.messages[#API.params.messages].content
-						.. "\n"
-						.. plugin.mode
+					.. "\n"
+					.. plugin.mode
 				plugin.mode = false
 			end
 
-			-- hide the input and reformat the window to include the chat history and current input
+			-- hide the input and reformat the popup window to include the chat history and current input
 			vim.schedule(function()
 				LayoutHandler.hide_input()
 				LayoutHandler.update_window_selection(true)
@@ -145,64 +195,22 @@ M.new = function()
 					if res.needs_web_search then
 						print("web search needed")
 						web_agent.feedback_loop(value, res)
+						utils.setTimeout(0.5, function()
+							ui_update()
+						end, function()
+							return API.done
+						end)
+						return
 					else
 						print("web search not needed")
+						model_call()
+						return
 					end
 				end)
 				return
 			end
 
-			-- check if model is loaded before calling ollama client
-			if API.model_loaded then
-				API.ollamaCall()
-			else
-				utils.setTimeout(0.5, function()
-					print("Delayed start: Model loading")
-					API.ollamaCall()
-				end, function()
-					return API.model_loaded
-				end)
-			end
-
-			-- check if full response has been generated before showing input window
-			if API.done then
-				vim.schedule(function()
-					LayoutHandler.show_input()
-					LayoutHandler.update_window_selection()
-				end, 0)
-
-				vim.schedule(function()
-					utils.reformat_session(API.params.messages)
-				end, 0)
-
-				utils.setTimeout(0.25, function()
-					vim.api.nvim_set_current_win(plugin.input.winid)
-				end)
-
-				API.done = false
-			else
-				utils.setTimeout(0.5, function()
-					vim.schedule(function()
-						LayoutHandler.show_input()
-						LayoutHandler.update_window_selection()
-					end, 0)
-
-					vim.schedule(function()
-						utils.reformat_session(API.params.messages)
-					end, 0)
-
-					utils.setTimeout(0.25, function()
-						vim.api.nvim_set_current_win(plugin.input.winid)
-					end)
-
-					API.done = false
-				end, function()
-					return API.done
-				end)
-			end
-
-			LayoutHandler.update_window_selection()
-			utils.set_keymaps()
+			model_call()
 		end,
 	})
 

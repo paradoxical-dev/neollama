@@ -23,6 +23,8 @@ M.config = {
 	},
 	web_agent = {
 		enabled = true,
+		include_sources = true,
+		include_queries = true,
 		user_agent = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36",
 		timeout = 15,
 		content_limit = 4000,
