@@ -24,7 +24,7 @@ M.buffer_agent = function(user_prompt, cb)
 		model = model or _G.NeollamaModel,
 		messages = {
 			{ role = "system", content = prompts.requires_current_data },
-			{ role = "user", content = user_prompt },
+			{ role = "user",   content = user_prompt },
 		},
 		format = "json",
 		stream = false,
@@ -77,7 +77,7 @@ M.integration_agent = function(user_prompt, site_content)
 		model = model or _G.NeollamaModel,
 		messages = {
 			{ role = "system", content = prompts.integration_prompt(user_prompt) },
-			{ role = "user", content = site_content },
+			{ role = "user",   content = site_content },
 		},
 		stream = plugin.config.params.stream,
 	}
@@ -130,7 +130,7 @@ M.site_select = function(user_prompt, search_results, failed_sites, cb)
 		model = model or _G.NeollamaModel,
 		messages = {
 			{ role = "system", content = prompts.site_select(user_prompt, failed_sites) },
-			{ role = "user", content = search_results },
+			{ role = "user",   content = search_results },
 		},
 		stream = false,
 	}
@@ -181,7 +181,7 @@ M.compilation_agent = function(user_prompt, content, cb)
 		model = model or _G.NeollamaModel,
 		messages = {
 			{ role = "system", content = prompts.compile_info(user_prompt) },
-			{ role = "user", content = content },
+			{ role = "user",   content = content },
 		},
 		stream = false,
 		options = {
@@ -236,8 +236,8 @@ M.res_check_agent = function(user_prompt, content, cb)
 	local params = {
 		model = model or _G.NeollamaModel,
 		messages = {
-			{ role = "system", content = prompts.response_checker_prompt(user_prompt, content) },
-			-- { role = "user", content = response },
+			{ role = "system", content = prompts.response_checker_prompt(user_prompt) },
+			{ role = "user",   content = content },
 		},
 		format = "json",
 		stream = false,
@@ -287,6 +287,9 @@ M.compiled_information = [[]]
 -- Combines the agent calls to simulate a feedback loop
 -- Reruns the function in the case that the information is inadequate or the chose site failed
 M.feedback_loop = function(value, res)
+	if M.query_index > #res.queries then
+		return
+	end
 	scraper.generate_search_results(res.queries[M.query_index], function(search_results)
 		M.site_select(value, search_results, scraper.failed_sites, function(url)
 			for _, site in ipairs(scraper.failed_sites) do
