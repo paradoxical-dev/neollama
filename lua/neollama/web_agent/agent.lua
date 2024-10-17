@@ -5,9 +5,14 @@ local scraper = require("neollama.web_agent.scraper")
 local M = {}
 
 local plugin
+local API
 
 M.set_plugin = function(init)
 	plugin = init
+end
+
+M.set_api = function(api)
+	API = api
 end
 
 -- Prompts the buffer agent to decide whether a web search is needed; provides queries if so
@@ -65,7 +70,7 @@ end
 
 -- Creates the final response to the users input using the compiled information from the feedback loop
 -- Will be treated the same as the standard Ollama call with its final response appended to the chat history
-M.integration_agent = function(user_prompt, site_content)
+M.integration_agent = function(user_prompt, compiled_content)
 	local res
 	local model
 	if not plugin.config.web_agent.use_current then
@@ -77,9 +82,12 @@ M.integration_agent = function(user_prompt, site_content)
 		model = model or _G.NeollamaModel,
 		messages = {
 			{ role = "system", content = prompts.integration_prompt(user_prompt) },
-			{ role = "user",   content = site_content },
+			{ role = "user",   content = compiled_content },
 		},
 		stream = plugin.config.params.stream,
+		options = {
+			num_ctx = 4096,
+		},
 	}
 	local args = {
 		"--silent",
@@ -98,6 +106,25 @@ M.integration_agent = function(user_prompt, site_content)
 		on_stderr = function(err)
 			print("Error: ", err)
 		end,
+		on_stdout = vim.schedule_wrap(function(err, value)
+			if err then
+				print("Error: " .. err)
+				return
+			end
+
+			if plugin.config.params.stream then
+				local res = vim.json.decode(value)
+				local chunk = res.message.content
+
+				API.constructed_response = API.constructed_response .. chunk
+				API.handle_stream(chunk)
+
+				if plugin.config.autoscroll then
+					vim.cmd("stopinsert")
+					vim.cmd("normal G$")
+				end
+			end
+		end),
 		on_exit = function(j, return_val)
 			if return_val == 0 then
 				local raw_response = vim.json.decode(j:result()[1])
@@ -108,7 +135,13 @@ M.integration_agent = function(user_prompt, site_content)
 
 				res = raw_response.message.content
 				print("Integration Response: ", res)
-				-- M.res_check_agent(user_prompt, res)
+
+				-- append completed response to standard chat history
+				API.params.messages[#API.params.messages + 1] = {
+					role = "assistant",
+					content = API.constructed_response,
+					model = res.model,
+				}
 			else
 				print("curl command failed with exit code: ", return_val)
 			end
@@ -314,11 +347,15 @@ M.feedback_loop = function(value, res)
 						M.res_check_agent(value, M.compiled_information, function(check)
 							if check.res_passed then
 								print("information is good")
+								M.integration_agent(value, M.compiled_information)
 							else
 								print("information is bad")
 								if M.query_index <= #res.queries then
 									M.query_index = M.query_index + 1
 									M.feedback_loop(value, res)
+								else
+									print("no more queries")
+									M.integration_agent(value, M.compiled_information)
 								end
 							end
 						end)

@@ -140,9 +140,6 @@ M.new = function()
 				end
 			end, 0)
 
-			-- TODO: Need to split this into separate functions. Ideally one for determinig the web search and another for the usage
-			-- INFO: Separated the loop structure into the `feedback_loop` function
-			-- WARN: This function and its implementation is yet to be tested
 			if plugin.config.web_agent.enabled then
 				web_agent.buffer_agent(value, function(res)
 					if res.needs_web_search then

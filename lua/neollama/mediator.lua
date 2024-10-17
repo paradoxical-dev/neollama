@@ -20,6 +20,7 @@ M.setup = function(api, layout, input, util, init, agent, scraper)
 	util.set_api(api)
 
 	agent.set_plugin(init)
+	agent.set_api(api)
 
 	scraper.set_plugin(init)
 end
