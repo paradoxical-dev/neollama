@@ -56,10 +56,6 @@ M.generate_search_results = function(query, cb)
 	}):start()
 end
 
--- Stores the current attempt | Is reset on success
-M.retry_count = 1
-M.failed_sites = {}
-
 local function is_visible_tag(tag)
 	local visible_tags = {
 		"p",
@@ -129,6 +125,10 @@ local function clean_text(content)
 	local cleaned = table.concat(split_text, " ")
 	return cleaned
 end
+
+-- Stores the current attempt | Is reset on success
+M.retry_count = 1
+M.failed_sites = {}
 
 -- Grabs the text from the website and passes to callback
 local function request_site(url, cb)

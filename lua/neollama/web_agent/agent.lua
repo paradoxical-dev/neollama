@@ -192,7 +192,7 @@ end
 -- Selects the best url from the search results using the titles and descriptions
 -- Returns the selected url
 -- TODO: Add a used queries table to be passed into the system prompt
-M.site_select = function(user_prompt, search_results, failed_sites, cb)
+M.site_select = function(user_prompt, search_results, failed_sites, used_sources, cb)
 	local res
 	local model
 	if not plugin.config.web_agent.use_current then
@@ -203,10 +203,11 @@ M.site_select = function(user_prompt, search_results, failed_sites, cb)
 	local params = {
 		model = model or _G.NeollamaModel,
 		messages = {
-			{ role = "system", content = prompts.site_select(user_prompt, failed_sites) },
+			{ role = "system", content = prompts.site_select(user_prompt, failed_sites, used_sources) },
 			{ role = "user", content = search_results },
 		},
 		stream = false,
+		format = "json",
 	}
 	local args = {
 		"--silent",
@@ -233,8 +234,8 @@ M.site_select = function(user_prompt, search_results, failed_sites, cb)
 					return
 				end
 
-				res = raw_response.message.content
-				cb(res)
+				res = vim.json.decode(raw_response.message.content)
+				cb(res.url)
 			else
 				print("curl command failed with exit code: ", return_val)
 			end
@@ -369,7 +370,7 @@ M.used_queries = {}
 M.feedback_loop = function(value, res)
 	scraper.generate_search_results(res.queries[M.query_index], function(search_results)
 		table.insert(M.used_queries, "- " .. res.queries[M.query_index])
-		M.site_select(value, search_results, scraper.failed_sites, function(url)
+		M.site_select(value, search_results, scraper.failed_sites, M.compiled_sources, function(url)
 			for _, site in ipairs(scraper.failed_sites) do
 				if url == site then
 					if M.query_index < #res.queries then
