@@ -91,6 +91,11 @@ M.separate_chunk = function(chunk)
 	end
 end
 
+-- used to escape regex special characters
+local function escape_pattern(str)
+	return str:gsub("([%%%^%$%(%)%.%[%]%*%+%-%?])", "%%%1")
+end
+
 -- Handling of the data from `separate_chunk`
 M.handle_stream = function(chunk)
 	local lines = vim.api.nvim_buf_get_lines(plugin.popup.bufnr, 0, -1, false)
@@ -104,14 +109,13 @@ M.handle_stream = function(chunk)
 	end
 	local wrapped_line = utils.line_wrap(current_line .. chunk, plugin.popup._.size.width - 2)
 
-	-- TODO: certain characters, such as '[' will disrupt the pattern in the find function and must be escaped
 	if separated_response[1] == (nil or "  " or "\n") then
 		vim.api.nvim_buf_set_lines(plugin.popup.bufnr, line_count + 1, line_count + 1, false, separated_response)
 	elseif #wrapped_line > 1 then
 		-- Add additional lines to split response
 		separated_response[1] = "  " .. wrapped_line[1]
 		for i, v in ipairs(wrapped_line) do
-			if i ~= 1 and not string.find(separated_response[1], v) then
+			if i ~= 1 and not string.find(separated_response[1], escape_pattern(v)) then
 				table.insert(separated_response, "  " .. v)
 			end
 		end

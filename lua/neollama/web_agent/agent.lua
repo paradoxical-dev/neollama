@@ -191,7 +191,6 @@ end
 
 -- Selects the best url from the search results using the titles and descriptions
 -- Returns the selected url
--- TODO: Add a used queries table to be passed into the system prompt
 M.site_select = function(user_prompt, search_results, failed_sites, used_sources, cb)
 	local res
 	local model
