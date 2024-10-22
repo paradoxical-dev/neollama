@@ -68,6 +68,28 @@ M.buffer_agent = function(user_prompt, cb)
 	}):start()
 end
 
+-- append sources and queries to the end of the compiled response accordingly
+local function append_sources(response, sources, queries)
+	if plugin.config.web_agent.include_sources and plugin.config.web_agent.include_queries then
+		response = response
+			.. "\n"
+			.. "\n"
+			.. "**Sources:**"
+			.. "\n"
+			.. table.concat(sources, "\n")
+			.. "\n\n"
+			.. "**Queries:**"
+			.. "\n"
+			.. table.concat(queries, "\n")
+	elseif plugin.config.web_agent.include_sources then
+		response = response .. "\n" .. "\n" .. "**Sources:**" .. "\n" .. table.concat(sources, "\n")
+	elseif plugin.config.web_agent.include_queries then
+		response = response .. "\n" .. "\n" .. "**Queries:**" .. "\n" .. table.concat(queries, "\n")
+	end
+
+	return response
+end
+
 -- Creates the final response to the users input using the compiled information from the feedback loop
 -- Will be treated the same as the standard Ollama call with its final response appended to the chat history
 M.integration_agent = function(user_prompt, compiled_content, sources, queries)
@@ -106,72 +128,58 @@ M.integration_agent = function(user_prompt, compiled_content, sources, queries)
 		on_stderr = function(err)
 			print("Error: ", err)
 		end,
-		on_stdout = vim.schedule_wrap(function(err, value)
+		on_stdout = function(err, value)
 			if err then
 				print("Error: " .. err)
 				return
 			end
 
 			if plugin.config.params.stream then
-				local response = vim.json.decode(value)
-				local chunk = response.message.content
+				vim.schedule(function()
+					local response = vim.json.decode(value)
+					local chunk = response.message.content
 
-				API.constructed_response = API.constructed_response .. chunk
-				API.handle_stream(chunk)
+					API.constructed_response = API.constructed_response .. chunk
+					-- print(API.constructed_response)
+					API.handle_stream(chunk)
 
-				if plugin.config.autoscroll then
-					vim.cmd("stopinsert")
-					vim.cmd("normal G$")
-				end
+					if plugin.config.autoscroll then
+						vim.cmd("stopinsert")
+						vim.cmd("normal G$")
+					end
+				end, 0)
 			end
-		end),
+		end,
 		on_exit = function(j, return_val)
 			if return_val == 0 then
-				local raw_response = vim.json.decode(j:result()[1])
-				if raw_response.error then
+				local raw_response = j:result()
+				local response = vim.json.decode(raw_response[1])
+
+				if raw_response.error or response.error then
 					print("Ollama API error: ", vim.inspect(raw_response))
 					return
 				end
 
-				print(vim.inspect(raw_response))
-				res = raw_response.message.content
-				print("Integration Response: ", res)
-
-				-- append sources and queries to the end of the compiled response accordingly
-				if plugin.config.web_agent.include_sources and plugin.config.web_agent.include_queries then
-					API.constructed_response = API.constructed_response
-						.. "\n"
-						.. "\n"
-						.. "**Sources:**"
-						.. "\n"
-						.. table.concat(sources, "\n")
-						.. "\n\n"
-						.. "**Queries:**"
-						.. "\n"
-						.. table.concat(queries, "\n")
-				elseif plugin.config.web_agent.include_sources then
-					API.constructed_response = API.constructed_response
-						.. "\n"
-						.. "\n"
-						.. "**Sources:**"
-						.. "\n"
-						.. table.concat(sources, "\n")
-				elseif plugin.config.web_agent.include_queries then
-					API.constructed_response = API.constructed_response
-						.. "\n"
-						.. "\n"
-						.. "**Queries:**"
-						.. "\n"
-						.. table.concat(queries, "\n")
+				if plugin.config.params.stream then
+					API.constructed_response = append_sources(API.constructed_response, sources, queries)
+				else
+					response.message.content = append_sources(response.message.content, sources, queries)
 				end
-				print("Final Response: ", API.constructed_response)
 
-				-- append completed response to standard chat history
-				API.params.messages[#API.params.messages + 1] = {
-					role = "assistant",
-					content = API.constructed_response,
-					model = raw_response.model,
-				}
+				M.compiled_sources = {}
+				M.used_queries = {}
+
+				if plugin.config.params.stream then
+					local response_table = {
+						role = "assistant",
+						content = API.constructed_response,
+						model = response.model,
+					}
+					table.insert(API.params.messages, #API.params.messages + 1, response_table)
+				else
+					response.message.model = response.model
+					table.insert(API.params.messages, #API.params.messages + 1, response.message)
+				end
 
 				API.done = true
 			else
@@ -183,6 +191,7 @@ end
 
 -- Selects the best url from the search results using the titles and descriptions
 -- Returns the selected url
+-- TODO: Add a used queries table to be passed into the system prompt
 M.site_select = function(user_prompt, search_results, failed_sites, cb)
 	local res
 	local model
@@ -251,6 +260,8 @@ M.compilation_agent = function(user_prompt, content, cb)
 		stream = false,
 		options = {
 			num_ctx = 4096,
+			temperature = 0.2,
+			top_p = 0.1,
 		},
 	}
 	local args = {
@@ -279,7 +290,7 @@ M.compilation_agent = function(user_prompt, content, cb)
 				end
 
 				res = raw_response.message.content
-				print("Compiled Response: ", vim.inspect(res))
+				-- print("Compiled Response: ", vim.inspect(res))
 				cb(res)
 			else
 				print("Curl command failed with exit code: ", return_val)
@@ -336,7 +347,7 @@ M.res_check_agent = function(user_prompt, content, cb)
 				end
 
 				res = vim.json.decode(raw_response.message.content)
-				print("Review Response: ", vim.inspect(res))
+				-- print("Review Response: ", vim.inspect(res))
 				cb(res)
 			else
 				print("curl command failed with exit code: ", return_val)
@@ -353,6 +364,8 @@ M.used_queries = {}
 
 -- Combines the agent calls to simulate a feedback loop
 -- Reruns the function in the case that the information is inadequate or the chose site failed
+---@param value string
+---@param res table|boolean
 M.feedback_loop = function(value, res)
 	scraper.generate_search_results(res.queries[M.query_index], function(search_results)
 		table.insert(M.used_queries, "- " .. res.queries[M.query_index])
@@ -385,10 +398,10 @@ M.feedback_loop = function(value, res)
 						M.compiled_information = M.compiled_information .. compiled_information
 						M.res_check_agent(value, M.compiled_information, function(check)
 							if check.res_passed then
-								print("information is good")
+								-- print("information is good")
 								M.integration_agent(value, M.compiled_information, M.compiled_sources, M.used_queries)
 							else
-								print("information is bad")
+								-- print("information is bad")
 								if M.query_index < #res.queries then
 									M.query_index = M.query_index + 1
 									M.feedback_loop(value, res)

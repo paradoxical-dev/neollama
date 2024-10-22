@@ -32,8 +32,8 @@ M.config = {
 		agent_models = {
 			use_current = true,
 			buffer_agent = "llama3.2",
-			integration_agent = "llama3.2",
-			reviewing_agent = "llama3.1",
+			reviewing_agent = "llama3.2",
+			integration_agent = "llama3.1",
 		},
 	},
 	layout = {

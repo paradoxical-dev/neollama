@@ -14,19 +14,19 @@ local function format_search_results(search_results)
 	local formatted = [[]]
 	for index, value in ipairs(search_results) do
 		formatted = formatted
-				.. "\n\n"
-				.. "Option "
-				.. index
-				.. ": "
-				.. "\n"
-				.. "Title: "
-				.. value.title
-				.. "\n"
-				.. "Description: "
-				.. value.abstract
-				.. "\n"
-				.. "URL: "
-				.. value.url
+			.. "\n\n"
+			.. "Option "
+			.. index
+			.. ": "
+			.. "\n"
+			.. "Title: "
+			.. value.title
+			.. "\n"
+			.. "Description: "
+			.. value.abstract
+			.. "\n"
+			.. "URL: "
+			.. value.url
 	end
 
 	return formatted
@@ -158,7 +158,9 @@ local function request_site(url, cb)
 		args = args,
 		cwd = "/usr/bin",
 		on_stderr = function(err)
-			print("Error: ", err)
+			if err ~= nil then
+				print("Error: ", err)
+			end
 		end,
 		on_exit = function(j, return_val)
 			if return_val == 0 then

@@ -40,6 +40,8 @@ local function ui_update()
 
 	utils.setTimeout(0.25, function()
 		vim.api.nvim_set_current_win(plugin.input.winid)
+	end, function()
+		return vim.api.nvim_win_is_valid(plugin.input.winid)
 	end)
 
 	API.done = false
@@ -164,8 +166,8 @@ M.new = function()
 			if plugin.mode ~= false then
 				API.params.messages[#API.params.messages].mode = true
 				API.params.messages[#API.params.messages].content = API.params.messages[#API.params.messages].content
-					.. "\n"
-					.. plugin.mode
+						.. "\n"
+						.. plugin.mode
 				plugin.mode = false
 			end
 

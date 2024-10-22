@@ -104,6 +104,7 @@ M.handle_stream = function(chunk)
 	end
 	local wrapped_line = utils.line_wrap(current_line .. chunk, plugin.popup._.size.width - 2)
 
+	-- TODO: certain characters, such as '[' will disrupt the pattern in the find function and must be escaped
 	if separated_response[1] == (nil or "  " or "\n") then
 		vim.api.nvim_buf_set_lines(plugin.popup.bufnr, line_count + 1, line_count + 1, false, separated_response)
 	elseif #wrapped_line > 1 then
@@ -285,9 +286,9 @@ M.get_opts = function()
 				elseif param == "stop" then
 					table.insert(constructed_params.stop, vals[i + 1])
 				elseif
-						constructed_params[vals[i - 1]] == param
-						or vals[i - 1] == "stop"
-						or constructed_params[vals[i - 1]] == tonumber(param)
+					constructed_params[vals[i - 1]] == param
+					or vals[i - 1] == "stop"
+					or constructed_params[vals[i - 1]] == tonumber(param)
 				then
 					goto continue
 				elseif i == #vals - 2 or vals[i + 1] == nil then
