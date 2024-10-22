@@ -166,8 +166,8 @@ M.new = function()
 			if plugin.mode ~= false then
 				API.params.messages[#API.params.messages].mode = true
 				API.params.messages[#API.params.messages].content = API.params.messages[#API.params.messages].content
-						.. "\n"
-						.. plugin.mode
+					.. "\n"
+					.. plugin.mode
 				plugin.mode = false
 			end
 
@@ -199,6 +199,21 @@ M.new = function()
 						web_agent.feedback_loop(value, res)
 						utils.setTimeout(0.5, function()
 							ui_update()
+							-- local file = io.open("web_log.txt", "w")
+							-- if file then
+							-- 	file:write("")
+							-- 	file:close()
+							-- end
+							local same_file = io.open("web_log.txt", "a+")
+							if same_file then
+								print("web search done, saving log")
+								same_file:write(vim.inspect(web_agent.log_info))
+								-- for _, log in ipairs(web_agent.log_info) do
+								-- 	same_file:write(log)
+								-- 	same_file:write("\n")
+								-- end
+								same_file:close()
+							end
 						end, function()
 							return API.done
 						end)

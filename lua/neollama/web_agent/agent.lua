@@ -15,6 +15,8 @@ M.set_api = function(api)
 	API = api
 end
 
+M.log_info = {}
+
 -- Prompts the buffer agent to decide whether a web search is needed; provides queries if so
 -- Callback is used to handle the returned data
 M.buffer_agent = function(user_prompt, cb)
@@ -60,6 +62,7 @@ M.buffer_agent = function(user_prompt, cb)
 				end
 
 				res = vim.json.decode(raw_response.message.content)
+				table.insert(M.log_info, "Buffer Agent: " .. vim.inspect(res))
 				cb(res)
 			else
 				print("curl command failed with exit code: ", return_val)
@@ -176,9 +179,11 @@ M.integration_agent = function(user_prompt, compiled_content, sources, queries)
 						model = response.model,
 					}
 					table.insert(API.params.messages, #API.params.messages + 1, response_table)
+					table.insert(M.log_info, "Integration Agent: " .. API.constructed_response)
 				else
 					response.message.model = response.model
 					table.insert(API.params.messages, #API.params.messages + 1, response.message)
+					table.insert(M.log_info, "Integration Agent: " .. response.message.content)
 				end
 
 				API.done = true
@@ -234,6 +239,7 @@ M.site_select = function(user_prompt, search_results, failed_sites, used_sources
 				end
 
 				res = vim.json.decode(raw_response.message.content)
+				table.insert(M.log_info, "Site Select: " .. res.url)
 				cb(res.url)
 			else
 				print("curl command failed with exit code: ", return_val)
@@ -290,7 +296,7 @@ M.compilation_agent = function(user_prompt, content, cb)
 				end
 
 				res = raw_response.message.content
-				-- print("Compiled Response: ", vim.inspect(res))
+				table.insert(M.log_info, "Compilation Agent: " .. res)
 				cb(res)
 			else
 				print("Curl command failed with exit code: ", return_val)
@@ -347,7 +353,7 @@ M.res_check_agent = function(user_prompt, content, cb)
 				end
 
 				res = vim.json.decode(raw_response.message.content)
-				-- print("Review Response: ", vim.inspect(res))
+				table.insert(M.log_info, "Response Check: " .. vim.inspect(res))
 				cb(res)
 			else
 				print("curl command failed with exit code: ", return_val)
@@ -394,6 +400,7 @@ M.feedback_loop = function(value, res)
 					end
 				else
 					table.insert(M.compiled_sources, url)
+					table.insert(M.log_info, "Scraper: " .. status.content)
 					M.compilation_agent(value, status.content, function(compiled_information)
 						M.compiled_information = M.compiled_information .. compiled_information
 						M.res_check_agent(value, M.compiled_information, function(check)
