@@ -31,7 +31,7 @@ M.buffer_agent = function(user_prompt, cb)
 		model = model or _G.NeollamaModel,
 		messages = {
 			{ role = "system", content = prompts.requires_current_data },
-			{ role = "user",   content = user_prompt },
+			{ role = "user", content = user_prompt },
 		},
 		format = "json",
 		stream = false,
@@ -84,7 +84,7 @@ M.query_gen = function(user_prompt, cb)
 		model = model or _G.NeollamaModel,
 		messages = {
 			{ role = "system", content = prompts.generate_query },
-			{ role = "user",   content = user_prompt },
+			{ role = "user", content = user_prompt },
 		},
 		format = "json",
 		stream = false,
@@ -128,15 +128,15 @@ end
 local function append_sources(response, sources, queries)
 	if plugin.config.web_agent.include_sources and plugin.config.web_agent.include_queries then
 		response = response
-				.. "\n"
-				.. "\n"
-				.. "**Sources:**"
-				.. "\n"
-				.. table.concat(sources, "\n")
-				.. "\n\n"
-				.. "**Queries:**"
-				.. "\n"
-				.. table.concat(queries, "\n")
+			.. "\n"
+			.. "\n"
+			.. "**Sources:**"
+			.. "\n"
+			.. table.concat(sources, "\n")
+			.. "\n\n"
+			.. "**Queries:**"
+			.. "\n"
+			.. table.concat(queries, "\n")
 	elseif plugin.config.web_agent.include_sources then
 		response = response .. "\n" .. "\n" .. "**Sources:**" .. "\n" .. table.concat(sources, "\n")
 	elseif plugin.config.web_agent.include_queries then
@@ -160,7 +160,7 @@ M.integration_agent = function(user_prompt, compiled_content, sources, queries)
 		model = model or _G.NeollamaModel,
 		messages = {
 			{ role = "system", content = prompts.integration_prompt(user_prompt) },
-			{ role = "user",   content = compiled_content },
+			{ role = "user", content = compiled_content },
 		},
 		stream = plugin.config.params.stream,
 		options = {
@@ -261,7 +261,7 @@ M.site_select = function(user_prompt, search_results, failed_sites, used_sources
 		model = model or _G.NeollamaModel,
 		messages = {
 			{ role = "system", content = prompts.site_select(user_prompt, failed_sites, used_sources) },
-			{ role = "user",   content = search_results },
+			{ role = "user", content = search_results },
 		},
 		stream = false,
 		format = "json",
@@ -314,7 +314,7 @@ M.compilation_agent = function(user_prompt, content, cb)
 		model = model or _G.NeollamaModel,
 		messages = {
 			{ role = "system", content = prompts.compile_info(user_prompt) },
-			{ role = "user",   content = content },
+			{ role = "user", content = content },
 		},
 		stream = false,
 		options = {
@@ -372,7 +372,7 @@ M.res_check_agent = function(user_prompt, content, cb)
 		model = model or _G.NeollamaModel,
 		messages = {
 			{ role = "system", content = prompts.response_checker_prompt(user_prompt) },
-			{ role = "user",   content = content },
+			{ role = "user", content = content },
 		},
 		format = "json",
 		stream = false,
@@ -425,7 +425,8 @@ M.used_queries = {}
 -- Reruns the function in the case that the information is inadequate or the chose site failed
 ---@param value string
 ---@param res table|boolean
-M.feedback_loop = function(value, res)
+---@param spinner function
+M.feedback_loop = function(value, res, spinner)
 	scraper.generate_search_results(res.queries[M.query_index], function(search_results)
 		table.insert(M.used_queries, "- " .. res.queries[M.query_index])
 		M.site_select(value, search_results, scraper.failed_sites, M.compiled_sources, function(url)
@@ -433,9 +434,10 @@ M.feedback_loop = function(value, res)
 				if url == site then
 					if M.query_index < #res.queries then
 						M.query_index = M.query_index + 1
-						M.feedback_loop(value, res)
+						M.feedback_loop(value, res, spinner)
 					else
 						print("no more queries")
+						spinner()
 						M.integration_agent(value, M.compiled_information, M.compiled_sources, M.used_queries)
 					end
 					return
@@ -446,9 +448,10 @@ M.feedback_loop = function(value, res)
 					print("failed to get content")
 					if M.query_index < #res.queries then
 						M.query_index = M.query_index + 1
-						M.feedback_loop(value, res)
+						M.feedback_loop(value, res, spinner)
 					else
 						print("no more queries")
+						spinner()
 						M.integration_agent(value, M.compiled_information, M.compiled_sources, M.used_queries)
 					end
 				else
@@ -458,15 +461,16 @@ M.feedback_loop = function(value, res)
 						M.compiled_information = M.compiled_information .. compiled_information
 						M.res_check_agent(value, M.compiled_information, function(check)
 							if check.res_passed then
-								-- print("information is good")
+								spinner()
 								M.integration_agent(value, M.compiled_information, M.compiled_sources, M.used_queries)
 							else
 								-- print("information is bad")
 								if M.query_index < #res.queries then
 									M.query_index = M.query_index + 1
-									M.feedback_loop(value, res)
+									M.feedback_loop(value, res, spinner)
 								else
 									print("no more queries")
+									spinner()
 									M.integration_agent(
 										value,
 										M.compiled_information,

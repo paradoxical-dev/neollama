@@ -433,6 +433,45 @@ end
 
 -- TEXT/LAYOUT MANIPULATION --
 
+M.spinner = function(buffer, line)
+	local spinner_frames = {
+		"⠋",
+		"⠙",
+		"⠹",
+		"⠸",
+		"⠼",
+		"⠴",
+		"⠦",
+		"⠧",
+		"⠇",
+		"⠏",
+	}
+	local spinner_index = 1
+	local timer = nil
+
+	-- function to update the spinner in the specified buffer and line
+	local function update_spinner()
+		if buffer and vim.api.nvim_buf_is_valid(buffer) then
+			local spinner_frame = spinner_frames[spinner_index]
+			vim.api.nvim_buf_set_lines(buffer, line, line, false, { spinner_frame .. " Web search in progress..." })
+			spinner_index = (spinner_index % #spinner_frames) + 1
+		end
+	end
+
+	-- start the spinner with a timer that updates every 100 ms
+	timer = vim.loop.new_timer()
+	timer:start(0, 100, vim.schedule_wrap(update_spinner))
+
+	-- return a function to stop the spinner when needed
+	return function()
+		if timer then
+			timer:stop()
+			timer:close()
+			timer = nil
+		end
+	end
+end
+
 -- Custom line wrqp function to respect virtual text
 M.line_wrap = function(str, width)
 	local t = {}
