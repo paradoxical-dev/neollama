@@ -177,8 +177,8 @@ M.new = function()
 			if plugin.mode ~= false then
 				API.params.messages[#API.params.messages].mode = true
 				API.params.messages[#API.params.messages].content = API.params.messages[#API.params.messages].content
-						.. "\n"
-						.. plugin.mode
+					.. "\n"
+					.. plugin.mode
 				plugin.mode = false
 			end
 
@@ -207,24 +207,8 @@ M.new = function()
 				web_agent.query_gen(value, function(res)
 					web_agent.feedback_loop(value, res)
 					utils.setTimeout(0.5, function()
-						local file = io.open("/home/mosus/.local/share/nvim/lazy/neollama/web_log.txt", "w")
-						if file then
-							print("web search done, clearing log")
-							file:close()
-						else
-							print("web search log failed to save: file not found")
-						end
-
-						local same_file = io.open("/home/mosus/.local/share/nvim/lazy/neollama/web_log.txt", "a")
-						if same_file then
-							print("web search done, saving log")
-							for _, log in ipairs(web_agent.log_info) do
-								same_file:write(log .. "\n\n")
-							end
-							same_file:close()
-						end
-
 						ui_update()
+						utils.write_log(web_agent.log_info)
 					end, function()
 						return API.done
 					end)
@@ -232,7 +216,6 @@ M.new = function()
 				return
 			end
 
-			-- TODO: move logging to data directroy for user reviews
 			-- TODO: create spinner to show progress of web search
 			if plugin.config.web_agent.enabled then
 				web_agent.buffer_agent(value, function(res)
@@ -240,24 +223,8 @@ M.new = function()
 						print("web search needed")
 						web_agent.feedback_loop(value, res)
 						utils.setTimeout(0.5, function()
-							local file = io.open("/home/mosus/.local/share/nvim/lazy/neollama/web_log.txt", "w")
-							if file then
-								print("web search done, clearing log")
-								file:close()
-							else
-								print("web search log failed to save: file not found")
-							end
-
-							local same_file = io.open("/home/mosus/.local/share/nvim/lazy/neollama/web_log.txt", "a")
-							if same_file then
-								print("web search done, saving log")
-								for _, log in ipairs(web_agent.log_info) do
-									same_file:write(log .. "\n\n")
-								end
-								same_file:close()
-							end
-
 							ui_update()
+							utils.write_log(web_agent.log_info)
 						end, function()
 							return API.done
 						end)

@@ -117,8 +117,8 @@ M.set_keymaps = function()
 			end
 		end
 		if
-				keymap.rhs == "<cmd>lua require('neollama.layout').window_next()<CR>"
-				or keymap.rhs == "<cmd>lua require('neollama.layout').window_prev()<CR>"
+			keymap.rhs == "<cmd>lua require('neollama.layout').window_next()<CR>"
+			or keymap.rhs == "<cmd>lua require('neollama.layout').window_prev()<CR>"
 		then
 			vim.api.nvim_set_keymap(
 				keymap.mode,
@@ -304,10 +304,10 @@ M.data_dir_check = function()
 		if not user_content then
 			print(
 				"The user data file was either not created or could not be read. Please try again.\nIf the issue persists check the following files:\n"
-				.. data_dir
-				.. "/chats.lua\n"
-				.. data_dir
-				.. "/user_data.json"
+					.. data_dir
+					.. "/chats.lua\n"
+					.. data_dir
+					.. "/user_data.json"
 			)
 		end
 		if not user_content:find("}") then
@@ -326,6 +326,23 @@ M.data_dir_check = function()
 	end
 
 	data_check()
+end
+
+M.write_log = function(logs)
+	local file = io.open(data_dir .. "/web_agent.txt", "w")
+	if file then
+		file:close()
+	else
+		print("web search log failed to save: file not found")
+	end
+
+	local same_file = io.open(data_dir .. "/web_agent.txt", "a")
+	if same_file then
+		for _, log in ipairs(logs) do
+			same_file:write(log .. "\n\n")
+		end
+		same_file:close()
+	end
 end
 
 -- Writes the current session to the chat file followed by an empty string
