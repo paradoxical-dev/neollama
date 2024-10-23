@@ -1,0 +1,30 @@
+Buffer Agent: {
+  needs_web_search = true,
+  queries = { "current price of bitcoin", "live bitcoin rate today", "bitcoin cryptocurrency price now", "latest bitcoin price update", "current value of one bitcoin" }
+}
+
+Site Select: https://cointelegraph.com/bitcoin-price
+
+Scraper: Home Price Indexes Bitcoin BTC price index Bitcoin BTC $66,276 1.76% This chart shows the price only in USD. $66,083.46 Low $67,805.81 High $33,318.60 Low $73,915.30 High About Bitcoin (BTC) is the cryptocurrency industry’s first asset . In the years since its 2009 launch, Bitcoin has ignited the growth and adoption of crypto, ultimately leading to the industry of today. BTC has a maximum supply of 21 million coins — a notable point of focus when discussing BTC value. Bitcoin price has been a prevalent topic throughout the asset’s history, with BTC price fluctuations occurring in dramatic fashion.  Satoshi Nakamoto , a pseudonymous person or group, published the Bitcoin white paper in 2008, laying out BTC’s concept. In 2009, Bitcoin’s first block, called its genesis block, went live and brought BTC officially into existence as an asset. Nakamoto ceased communication in Bitcoin’s early years, and their real identity remains a mystery.  Although the crypto industry started with just Bitcoin and its underlying blockchain technology, the sector now includes thousands of assets alongside numerous different blockchains and solutions pertaining to a bevy of use cases. Over time, competitors have aimed to create different digital assets that improve on Bitcoin’s model as a store of value and transactional asset, but Bitcoin still remains the top asset by market capitalization, thanks to the BTC USD price equivalent. How Bitcoin works As Bitcoin’s adoption has grown over the years, more people have likely begun wondering how Bitcoin works. Bitcoin is a decentralized cryptocurrency that operates on its own blockchain (the Bitcoin blockchain) secured and run by a vast global network of participants. It is a borderless asset that can be traded and transacted fractionally. Safeguarded by its open-source code, Bitcoin’s 21 million maximum coin supply makes the asset scarce and deflationary, unlike the U.S. dollar. Often valued in a pair with the U.S. dollar, the Bitcoin price USD value has increased massively over the years. BTC owners can store Bitcoin themselves and transact it globally, void of any limitations on hours of operation. BTC has also gained a significant amount of mainstream attention over time, likely due to public support from celebrities such as Elon Musk and adoption from companies such as PayPal. What is Bitcoin mining, and how does it work? As mentioned above, Bitcoin runs on its own blockchain, excluding the need for any third-party help in facilitating transactions and storing value. Bitcoin mining is the magic behind the Bitcoin network.  Bitcoin runs on a proof-of-work (PoW) blockchain , which is essentially a chain of consecutive blocks containing transaction activity. Bitcoin miners run specialized computer equipment that constantly searches for the answers to complex math puzzles. The miner, or group of miners, that solves the puzzle receives a reward in the form of BTC: the block reward and the transaction fees paid by senders of the Bitcoin transactions included in that specific block. Bitcoin’s carbon footprint has been a topic of discussion, however, due to the energy required for mining. How and where to buy Bitcoin Bitcoin can be traded via numerous avenues . Buying BTC on a crypto or Bitcoin exchange is one such method of trading Bitcoin. Those interested can also buy Bitcoin in other ways, such as in a peer-to-peer fashion. One possible route for those wishing to use or hold Bitcoin might include making an account on a centralized crypto exchange, sending money from a linked bank account and then buying Bitcoin on the exchange. It is important, however, to comply with any relevant jurisdictional laws when purchasing Bitcoin or other cryptocurrencies, such as Know Your Customer (KYC) and Anti-Money Laundering (AML) requirements.  How much is 1 Bitcoin worth? What is the price of Bitcoin today? What is Bitcoin’s value today? These are all logical questions. Bitcoin’s USD price changes constantly, as the asset trades on the market 24/7 without holidays. The current Bitcoin price can be seen at the top of the page via the live Bitcoin price. For Bitcoin price history, see the Bitcoin price chart above or the Bitcoin price table below.  Latest Market News BTC Key Metrics Market Cap $1.30T Volume (24h) $25.85B Circulating Supply 19.76M BTC Total Supply 19.76M BTC YTD Return 51.68% Open Price (24h) $67,454.62 High (24h) $67,805.81 Low (24h) $66,083.46 High (52w) $73,915.30 Low (52w) $33,318.60 All-Time High $73,915.30
+
+Compilation Agent: Here are the most relevant points and facts directly related to the user's input "what is the current price of Bitcoin?":
+
+* The current price of Bitcoin is: **$66,276**
+* This chart shows the price only in USD.
+* The high price for today is: **$67,805.81**
+* The low price for today is: **$66,083.46**
+
+Response Check: {
+  res_passed = true
+}
+
+Integration Agent: Based on the provided information, I can give a clear and concise answer to the user's question.
+
+The current price of Bitcoin is **$66,276**, which is based on the chart that shows prices only in USD. It's worth noting that the high price for today was **$67,805.81** and the low price was **$66,083.46**, indicating some fluctuation in the market.
+
+**Sources:**
+https://cointelegraph.com/bitcoin-price
+
+**Queries:**
+- current price of bitcoin
+

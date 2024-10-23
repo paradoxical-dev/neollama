@@ -166,8 +166,8 @@ M.new = function()
 			if plugin.mode ~= false then
 				API.params.messages[#API.params.messages].mode = true
 				API.params.messages[#API.params.messages].content = API.params.messages[#API.params.messages].content
-					.. "\n"
-					.. plugin.mode
+						.. "\n"
+						.. plugin.mode
 				plugin.mode = false
 			end
 
@@ -198,22 +198,24 @@ M.new = function()
 						print("web search needed")
 						web_agent.feedback_loop(value, res)
 						utils.setTimeout(0.5, function()
-							ui_update()
-							-- local file = io.open("web_log.txt", "w")
-							-- if file then
-							-- 	file:write("")
-							-- 	file:close()
-							-- end
-							local same_file = io.open("web_log.txt", "a+")
+							local file = io.open("/home/mosus/.local/share/nvim/lazy/neollama/web_log.txt", "w")
+							if file then
+								print("web search done, clearing log")
+								file:close()
+							else
+								print("web search log failed to save: file not found")
+							end
+
+							local same_file = io.open("/home/mosus/.local/share/nvim/lazy/neollama/web_log.txt", "a")
 							if same_file then
 								print("web search done, saving log")
-								same_file:write(vim.inspect(web_agent.log_info))
-								-- for _, log in ipairs(web_agent.log_info) do
-								-- 	same_file:write(log)
-								-- 	same_file:write("\n")
-								-- end
+								for _, log in ipairs(web_agent.log_info) do
+									same_file:write(log .. "\n\n")
+								end
 								same_file:close()
 							end
+
+							ui_update()
 						end, function()
 							return API.done
 						end)
