@@ -148,6 +148,15 @@ M.new = function()
 				return
 			end
 
+			-- toggle web agent
+			if value == "/w" then
+				plugin.config.web_agent.enabled = not plugin.config.web_agent.enabled
+
+				LayoutHandler.remount()
+				utils.reformat_session(API.params.messages)
+				return
+			end
+
 			-- check if cursor was set to non plugin window
 			local winid = vim.fn.win_getid()
 			local is_neollama = false
@@ -158,10 +167,12 @@ M.new = function()
 			end
 			if not is_neollama then
 				LayoutHandler.remount()
+				utils.reformat_session(API.params.messages)
 			end
 
 			-- insert input to chat history
 			table.insert(API.params.messages, #API.params.messages + 1, { role = "user", content = value })
+
 			-- check for visual mode including the selection if necessary
 			if plugin.mode ~= false then
 				API.params.messages[#API.params.messages].mode = true
@@ -192,6 +203,37 @@ M.new = function()
 				end
 			end, 0)
 
+			if plugin.config.web_agent.enabled and plugin.config.web_agent.manual then
+				web_agent.query_gen(value, function(res)
+					web_agent.feedback_loop(value, res)
+					utils.setTimeout(0.5, function()
+						local file = io.open("/home/mosus/.local/share/nvim/lazy/neollama/web_log.txt", "w")
+						if file then
+							print("web search done, clearing log")
+							file:close()
+						else
+							print("web search log failed to save: file not found")
+						end
+
+						local same_file = io.open("/home/mosus/.local/share/nvim/lazy/neollama/web_log.txt", "a")
+						if same_file then
+							print("web search done, saving log")
+							for _, log in ipairs(web_agent.log_info) do
+								same_file:write(log .. "\n\n")
+							end
+							same_file:close()
+						end
+
+						ui_update()
+					end, function()
+						return API.done
+					end)
+				end)
+				return
+			end
+
+			-- TODO: move logging to data directroy for user reviews
+			-- TODO: create spinner to show progress of web search
 			if plugin.config.web_agent.enabled then
 				web_agent.buffer_agent(value, function(res)
 					if res.needs_web_search then
