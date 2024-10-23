@@ -117,8 +117,8 @@ M.set_keymaps = function()
 			end
 		end
 		if
-			keymap.rhs == "<cmd>lua require('neollama.layout').window_next()<CR>"
-			or keymap.rhs == "<cmd>lua require('neollama.layout').window_prev()<CR>"
+				keymap.rhs == "<cmd>lua require('neollama.layout').window_next()<CR>"
+				or keymap.rhs == "<cmd>lua require('neollama.layout').window_prev()<CR>"
 		then
 			vim.api.nvim_set_keymap(
 				keymap.mode,
@@ -259,17 +259,15 @@ local data_dir = vim.env.HOME .. "/.local/share/nvim/neollama"
 -- Checks if data directory and file structure exists before ensuring user_data file is populated
 M.data_dir_check = function()
 	if not vim.loop.fs_stat(data_dir) then
-		print("No data directory could be located. Creating directory at " .. data_dir)
 		vim.loop.fs_mkdir(data_dir, 511)
 	end
 
 	local function check_file()
-		local files = { data_dir .. "/chats.lua", data_dir .. "/user_data.json" }
+		local files = { data_dir .. "/chats.lua", data_dir .. "/user_data.json", data_dir .. "/web_agent.txt" }
 		local files_needed = false
 
 		for _, file in ipairs(files) do
 			if not vim.loop.fs_stat(file) then
-				print("No chat file could be located. Creating file at " .. file)
 				files_needed = true
 				local f = io.open(file, "w")
 				if f then
@@ -306,10 +304,10 @@ M.data_dir_check = function()
 		if not user_content then
 			print(
 				"The user data file was either not created or could not be read. Please try again.\nIf the issue persists check the following files:\n"
-					.. data_dir
-					.. "/chats.lua\n"
-					.. data_dir
-					.. "/user_data.json"
+				.. data_dir
+				.. "/chats.lua\n"
+				.. data_dir
+				.. "/user_data.json"
 			)
 		end
 		if not user_content:find("}") then
