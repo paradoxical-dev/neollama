@@ -117,8 +117,8 @@ M.set_keymaps = function()
 			end
 		end
 		if
-			keymap.rhs == "<cmd>lua require('neollama.layout').window_next()<CR>"
-			or keymap.rhs == "<cmd>lua require('neollama.layout').window_prev()<CR>"
+				keymap.rhs == "<cmd>lua require('neollama.layout').window_next()<CR>"
+				or keymap.rhs == "<cmd>lua require('neollama.layout').window_prev()<CR>"
 		then
 			vim.api.nvim_set_keymap(
 				keymap.mode,
@@ -304,10 +304,10 @@ M.data_dir_check = function()
 		if not user_content then
 			print(
 				"The user data file was either not created or could not be read. Please try again.\nIf the issue persists check the following files:\n"
-					.. data_dir
-					.. "/chats.lua\n"
-					.. data_dir
-					.. "/user_data.json"
+				.. data_dir
+				.. "/chats.lua\n"
+				.. data_dir
+				.. "/user_data.json"
 			)
 		end
 		if not user_content:find("}") then
@@ -433,6 +433,7 @@ end
 
 -- TEXT/LAYOUT MANIPULATION --
 
+-- TODO: make spinner customizable using NuiText / NuiLine
 M.spinner = function(buffer, line)
 	local spinner_frames = {
 		"⠋",
@@ -449,25 +450,28 @@ M.spinner = function(buffer, line)
 	local spinner_index = 1
 	local timer = nil
 
-	-- function to update the spinner in the specified buffer and line
 	local function update_spinner()
-		if buffer and vim.api.nvim_buf_is_valid(buffer) then
-			local spinner_frame = spinner_frames[spinner_index]
-			vim.api.nvim_buf_set_lines(buffer, line, line, false, { spinner_frame .. " Web search in progress..." })
-			spinner_index = (spinner_index % #spinner_frames) + 1
-		end
+		vim.schedule(function()
+			if buffer and vim.api.nvim_buf_is_valid(buffer) then
+				local spinner_frame = spinner_frames[spinner_index]
+				vim.api.nvim_buf_set_lines(buffer, line, -1, false, { spinner_frame .. " Web search in progress..." })
+				spinner_index = (spinner_index % #spinner_frames) + 1
+			end
+		end)
 	end
 
-	-- start the spinner with a timer that updates every 100 ms
 	timer = vim.loop.new_timer()
-	timer:start(0, 100, vim.schedule_wrap(update_spinner))
+	timer:start(0, 100, update_spinner)
 
-	-- return a function to stop the spinner when needed
+	-- return a function to stop and clear the spinner
 	return function()
 		if timer then
 			timer:stop()
 			timer:close()
 			timer = nil
+			vim.schedule(function()
+				vim.api.nvim_buf_set_lines(buffer, line, -1, false, { "  ", "  " })
+			end)
 		end
 	end
 end

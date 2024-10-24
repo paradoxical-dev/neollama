@@ -102,6 +102,7 @@ M.new = function()
 		on_close = function() end,
 		on_submit = function(value) -- Inserts user input accordingly while calling the ollama client with the user input
 			-- handle save command
+			-- TODO: make external function to handle input commands and web agent calls for readability
 			if value == "/s" then
 				plugin.layout:hide()
 
@@ -120,6 +121,7 @@ M.new = function()
 			end
 
 			-- handle config editor command
+			-- TODO: make sure chat history is replaced when config editor is closed
 			if value == "/c" then
 				plugin.layout:hide()
 
@@ -148,7 +150,8 @@ M.new = function()
 				return
 			end
 
-			-- toggle web agent
+			-- handle web agent command
+			-- TODO: add some kind of notification to signal whether the web_agent is active or not
 			if value == "/w" then
 				plugin.config.web_agent.enabled = not plugin.config.web_agent.enabled
 
@@ -177,13 +180,14 @@ M.new = function()
 			if plugin.mode ~= false then
 				API.params.messages[#API.params.messages].mode = true
 				API.params.messages[#API.params.messages].content = API.params.messages[#API.params.messages].content
-					.. "\n"
-					.. plugin.mode
+						.. "\n"
+						.. plugin.mode
 				plugin.mode = false
 			end
 
-			-- hide the input and reformat the popup window to include the chat history and current input
+			-- Continue with the rest of the ollama client depending on the circumstance
 			vim.schedule(function()
+				-- hide the input window and reformat the popup window to include the chat history and current user input
 				LayoutHandler.hide_input()
 				LayoutHandler.update_window_selection(true)
 				utils.reformat_session(API.params.messages)
@@ -201,28 +205,16 @@ M.new = function()
 
 					API.constructed_response = ""
 				end
-			end, 0)
 
-			if plugin.config.web_agent.enabled and plugin.config.web_agent.manual then
-				local stop_spinner = utils.spinner(plugin.popup.bufnr, -1)
-				web_agent.query_gen(value, function(res)
-					web_agent.feedback_loop(value, res, stop_spinner)
-					utils.setTimeout(0.5, function()
-						ui_update()
-						utils.write_log(web_agent.log_info)
-					end, function()
-						return API.done
-					end)
-				end)
-				return
-			end
+				local current_line_count = vim.api.nvim_buf_line_count(plugin.popup.bufnr)
+				if API.params.stream then
+					current_line_count = current_line_count - 1
+				end
 
-			-- TODO: create spinner to show progress of web search
-			if plugin.config.web_agent.enabled then
-				local stop_spinner = utils.spinner(plugin.popup.bufnr, -1)
-				web_agent.buffer_agent(value, function(res)
-					if res.needs_web_search then
-						print("web search needed")
+				-- handle web agent calling if necessary
+				if plugin.config.web_agent.enabled and plugin.config.web_agent.manual then
+					local stop_spinner = utils.spinner(plugin.popup.bufnr, current_line_count)
+					web_agent.query_gen(value, function(res)
 						web_agent.feedback_loop(value, res, stop_spinner)
 						utils.setTimeout(0.5, function()
 							ui_update()
@@ -230,17 +222,71 @@ M.new = function()
 						end, function()
 							return API.done
 						end)
-						return
-					else
-						print("web search not needed")
-						model_call()
-						return
-					end
-				end)
-				return
-			end
+					end)
+					return
+				end
 
-			model_call()
+				-- TODO: create spinner to show progress of web search
+				if plugin.config.web_agent.enabled then
+					local stop_spinner = utils.spinner(plugin.popup.bufnr, current_line_count + 1)
+					web_agent.buffer_agent(value, function(res)
+						if res.needs_web_search then
+							web_agent.feedback_loop(value, res, stop_spinner)
+							utils.setTimeout(0.5, function()
+								ui_update()
+								utils.write_log(web_agent.log_info)
+							end, function()
+								return API.done
+							end)
+							return
+						else
+							model_call()
+							return
+						end
+					end)
+					return
+				end
+
+				-- standard model call if none apply
+				model_call()
+			end, 0)
+
+			-- if plugin.config.web_agent.enabled and plugin.config.web_agent.manual then
+			-- 	local stop_spinner = utils.spinner(plugin.popup.bufnr, current_line_count + 1)
+			-- 	web_agent.query_gen(value, function(res)
+			-- 		web_agent.feedback_loop(value, res, stop_spinner)
+			-- 		utils.setTimeout(0.5, function()
+			-- 			ui_update()
+			-- 			utils.write_log(web_agent.log_info)
+			-- 		end, function()
+			-- 			return API.done
+			-- 		end)
+			-- 	end)
+			-- 	return
+			-- end
+			--
+			-- -- TODO: create spinner to show progress of web search
+			-- if plugin.config.web_agent.enabled then
+			-- 	local stop_spinner = utils.spinner(plugin.popup.bufnr, current_line_count + 1)
+			-- 	web_agent.buffer_agent(value, function(res)
+			-- 		if res.needs_web_search then
+			-- 			web_agent.feedback_loop(value, res, stop_spinner)
+			-- 			utils.setTimeout(0.5, function()
+			-- 				ui_update()
+			-- 				utils.write_log(web_agent.log_info)
+			-- 			end, function()
+			-- 				return API.done
+			-- 			end)
+			-- 			return
+			-- 		else
+			-- 			model_call()
+			-- 			return
+			-- 		end
+			-- 	end)
+			-- 	return
+			-- end
+
+			-- model_call()
 		end,
 	})
 
