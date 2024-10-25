@@ -198,9 +198,9 @@ To install neollama, simply use your prefferred package manager. For example, us
 > 
 > Any helper agent which is set will not have the default options applied and will have to be explicitly set
 
-## Usage
+# Usage
 
-### Input Commands
+## Input Commands
 Neollama offers three input commands for quick access to certain functionalities:
 
 <details>
@@ -238,7 +238,7 @@ Neollama offers three input commands for quick access to certain functionalities
   
 </details>
 
-### Config Editor
+## Config Editor
 The config editor opens an interactive popup window which displays the set options for the current model. 
 
 if no value is set for an option and the model has no default value, then the plugins default will be used. 
@@ -255,7 +255,7 @@ When finishe editing use the change_config command set in the configuration and 
 >
 > If the value already has a set value be sure to change the value in the extra_options table not the default_options table
 
-## Web Agent
+# Web Agent
 
 ### Overview
 The web agent is created using sequential model calls with predefined perameters and system prompts. 
