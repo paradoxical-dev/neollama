@@ -56,7 +56,6 @@ M.generate_search_results = function(query, cb)
 	}):start()
 end
 
--- TODO: expand this function to include more niche tags for sites using frameworks or other caveats
 local function is_visible_tag(tag)
 	local visible_tags = {
 		"p",
@@ -80,12 +79,29 @@ local function is_visible_tag(tag)
 		"code",
 		"main",
 		"section",
+		"article",
+		"details",
+		"summary",
+		"aside",
+		"figure",
+		"figcaption",
+		"blockquote",
+		"mark",
+		"dl",
+		"dt",
+		"dd",
 	}
 	for _, visible_tag in ipairs(visible_tags) do
 		if tag == visible_tag then
 			return true
 		end
 	end
+
+	-- typical format for custom framework tags
+	if tag:find("-") then
+		return true
+	end
+
 	return false
 end
 
