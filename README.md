@@ -173,7 +173,7 @@ To install neollama, simply use your prefferred package manager. For example, us
       buffer_agent = { model = "qwen2.5:3b" },
       reviewing_agent = { model = "qwen2.5:3b", options = { num_ctx = 4096 } },
       -- You can set any agent to use the current model using this global
-      -- Any params applied to this agent will not be applied to the sessions current model
+      -- Any options applied to an agent using this global will not be applied to the sessions current model
       integration_agent = { model = _G.NeollamaModel, options = { temperature = 0.5 } }
     },
   },
@@ -197,17 +197,19 @@ To install neollama, simply use your prefferred package manager. For example, us
 Neollama offers three input commands for quick access to certain functionalities:
 
 ### **`/s`**
+<details>
+  <summary>Save command</summary>
+  Using `/s` from the input window you are able to save the current session. Saving the session saves all aspects of the current session including the current model with set parameters and the current chat history. 
 
-Using `/s` from the input window you are able to save the current session. Saving the session saves all aspects of the current session including the current model with set parameters and the current chat history. 
+  If ypu attempt to save a chat and the `max_xhats` limit has been reached, you'll be prompted to overwrite an existing session which will then be lost.
+  > [!TIP]
+  >
+  > All sessions are saved in the neollama data directory `~/.local/share/nvim/neollama/` in the `chats.lua` file. While these are stored as lua tables, their names are not bound to typical naming conventions.
 
-If ypu attempt to save a chat and the `max_xhats` limit has been reached, you'll be prompted to overwrite an existing session which will then be lost.
-> [!TIP]
->
-> All sessions are saved in the neollama data directory `~/.local/share/nvim/neollama/` in the `chats.lua` file. While these are stored as lua tables, their names are not bound to typical naming conventions.
-
-> [!WARNING]
-> 
-> It is not possible to set the max_chats to a lower value than the number of saved sessions, since there is no manual deletion.
+  > [!WARNING]
+  > 
+  > It is not possible to set the max_chats to a lower value than the number of saved sessions, since there is no manual deletion.
+</details>
 
 ### **`/c`**
 
