@@ -279,7 +279,7 @@ Generates the output for the user, using the compiled information.
 
 It's response will be treated the same as the standard model call and will be appended to the current sessions chat history.
 
-### Customization
+## Customization
 Each helper agent is completely customizeable; from the model used to the options applied to them.
 
 It is recommended for most users to stick to a max of two smaller (3b or lower) models for the helper agents. Personally, I found qwen2.5:3b to be perfect for the reviewing and buffer agents due to its high context window for inputs.
@@ -292,7 +292,7 @@ This feature can be disabled for efficency using the `manual` option in the `web
 
 The configurations default options are what I have tested to work best, but user's have the freedom to customize and test these options with any accepted value.
 
-### Schema
+## Schema
 The schema is best visualized using a flow chart:
 
 ![Schema flow chart](/schema.png)
@@ -301,5 +301,7 @@ For a better understanding of how the agent works under the hood, a good video c
 
 It is the video I used to better grasp the concept and take inspiration from to create a lua solution.
 
-## Contributing
+# Contributing
+Apart from bug fixes I come across in my usage, I do not plan on extending or adding features to the plugin.
 
+If anyone *would* like to contribute, I will leave pull requests open and handle those as best I can
