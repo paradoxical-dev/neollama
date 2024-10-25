@@ -164,33 +164,33 @@ To install neollama, simply use your prefferred package manager. For example, us
 </details>
 
 <details>
-  <summary>**Example configuration:**</summary>
+  <summary>Example configuration:</summary>
   ```lua
-{
-  params = {
-    model = "llama3.1:latest",
-    stream = true,
-  },
-  web_agent = {
-    agent_models = {
-      use_current = false,
-      buffer_agent = { model = "qwen2.5:3b" },
-      reviewing_agent = { model = "qwen2.5:3b", options = { num_ctx = 4096 } },
-      -- You can set any agent to use the current model using this global
-      -- Any options applied to an agent using this global will not be applied to the sessions current model
-      integration_agent = { model = _G.NeollamaModel, options = { temperature = 0.5 } }
+  {
+    params = {
+      model = "llama3.1:latest",
+      stream = true,
     },
-  },
-  layout = {
-    border = {
-      default = "double",
+    web_agent = {
+      agent_models = {
+        use_current = false,
+        buffer_agent = { model = "qwen2.5:3b" },
+        reviewing_agent = { model = "qwen2.5:3b", options = { num_ctx = 4096 } },
+        -- You can set any agent to use the current model using this global
+        -- Any options applied to an agent using this global will not be applied to the sessions current model
+        integration_agent = { model = _G.NeollamaModel, options = { temperature = 0.5 } }
+      },
     },
-    input = {
-      hl = { fg = "#C9C7CD", bold = true, italic = true },
+    layout = {
+      border = {
+        default = "double",
+      },
+      input = {
+        hl = { fg = "#C9C7CD", bold = true, italic = true },
+      },
     },
-  },
-}
-```
+  }
+  ```
 </details>
 
 > [!NOTE]
