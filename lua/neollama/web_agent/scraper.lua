@@ -201,6 +201,7 @@ local function request_site(url, cb)
 				else
 					print("Failed to scrape website: " .. url .. " after " .. M.retry_count .. " retries")
 					M.retry_count = 1
+					cb(false)
 				end
 			end
 		end,
@@ -227,6 +228,13 @@ M.scrape_website_content = function(website_url, failed_sites, cb)
 	local status
 
 	request_site(website_url, function(cleaned_text)
+		if not cleaned_text then
+			table.insert(failed_sites, website_url)
+			status = false
+			cb(status)
+			return
+		end
+
 		if is_garbled(cleaned_text) then
 			table.insert(failed_sites, website_url)
 			status = false
