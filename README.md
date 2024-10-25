@@ -1,6 +1,8 @@
 # neollama
 A UI meant for interacting with Ollama models from within Neovim.
 
+(main image or showcase video here)
+
 ## Features
 - Model switching with chat retention
 - Session saving and reloading
@@ -194,26 +196,36 @@ Neollama offers three input commands for quick access to certain functionalities
 ### **`/s`**
 
 Using `/s` from the input window you are able to save the current session. Saving the session saves all aspects of the current session including the current model with set parameters and the current chat history. If ypu attempt to save a chat and the `max_xhats` limit has been reached, you'll be prompted to overwrite an existing session which will then be lost.
-> [!NOTE]
+> [!TIP]
 >
 > All sessions are saved in the neollama data directory `~/.local/share/nvim/neollama/` in the `chats.lua` file. While these are stored as lua tables, their names are not bound to typical naming conventions.
->
+
+> [!WARN]
+> 
 > Additionally, it is not possible to set the max_chats to a lower value than the number of saved sessions, since there is no manual deletion.
 
-**`/c`**
+### **`/c`**
 
 The `/c` command allows you to enter the config editor for on-the-fly tuning of model parameters. See [Config Editor](#config-editor) section for more details.
 
-**`/w`**
+### **`/w`**
 
 The `/w` command toggles the web_agent. The current status of the web agent is denoted by the symbol next to the model name in the main chat window.
 
 ### Config Editor
+The config editor opens an interactive popup window which displays the set options for the current model. Each value will be set to the models default options (if not value is provided in the configuration) or, if no default is set and the model has no default value for the option then the plugins default will be used. To change a value, simply replace it's current value with the desired one. Then, when finished, simply use the change_config command set in the configuration and the new options will be applied
+
+(example video)
+
+> [!NOTE]
+>
+> All extra optiosn will be defaulted to an empty string unless they are set in the configuration. To edit these optiosn from the editor enter the value within the string. if the value already has a set value be sure to change the value in the extra_options table not the default_options table
 
 ## Web Agent
 
 ### Overview
 The web agent is created using sequential model calls with predefined perameters and system prompts. There are three main helper agents used:
+
 **Buffer agent:**
 
 The buffer agent is responsible for deciding if the user's query will require a web search (if manual is set to false) and generating the proper queries for the search. Additionally, the results from the ddgr command, which uses the generated queries, will be fed to this model and will return the decided best URL based on the user input.
