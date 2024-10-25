@@ -26,6 +26,21 @@ end
 
 -- LAYOUT TOGGLING --
 
+-- applies the window variables to hude cursor from within them
+local function apply_menu_var(menu1, menu2)
+	if menu1.winid == nil or menu2.winid == nil then
+		utils.setTimeout(0.25, function()
+			vim.api.nvim_win_set_var(menu1.winid, "NeollamaLayoutMenu", true)
+			vim.api.nvim_win_set_var(menu2.winid, "NeollamaLayoutMenu", true)
+		end, function()
+			return menu1.winid
+		end)
+	else
+		vim.api.nvim_win_set_var(menu1.winid, "NeollamaLayoutMenu", true)
+		vim.api.nvim_win_set_var(menu2.winid, "NeollamaLayoutMenu", true)
+	end
+end
+
 --[[ Logic for toggeling the layout module checks; for whether the module
 is shown or mounted before adjusting other window layouts ]]
 M.menu_shown = true
@@ -58,6 +73,7 @@ M.toggle_layout = function()
 
 		M.menu_shown = true
 		M.update_window_selection()
+		apply_menu_var(plugin.model_picker, plugin.session_picker)
 		return
 	else
 		plugin.layout:update(
@@ -82,7 +98,7 @@ M.toggle_layout = function()
 	end
 end
 
--- hide the input during response generation
+-- Hide the input during response generation
 M.hide_input = function()
 	plugin.popup = M.popup().popup
 	local resized_dimensions
@@ -151,6 +167,7 @@ M.show_input = function()
 		}, { dir = "row" }))
 
 		M.update_window_selection()
+		apply_menu_var(plugin.model_picker, plugin.session_picker)
 	else
 		plugin.layout:update(Layout.Box({
 			Layout.Box({
@@ -705,19 +722,7 @@ M.main_layout = function(p, i, menu1, menu2)
 				}, { dir = "col", size = "20%" }),
 			}, { dir = "row" })
 		)
-
-		-- Add winvar to menus to hide cursor when within them
-		if menu1.winid == nil or menu2.winid == nil then
-			utils.setTimeout(0.25, function()
-				vim.api.nvim_win_set_var(menu1.winid, "NeollamaLayoutMenu", true)
-				vim.api.nvim_win_set_var(menu2.winid, "NeollamaLayoutMenu", true)
-			end, function()
-				return menu1.winid
-			end)
-		else
-			vim.api.nvim_win_set_var(menu1.winid, "NeollamaLayoutMenu", true)
-			vim.api.nvim_win_set_var(menu2.winid, "NeollamaLayoutMenu", true)
-		end
+		apply_menu_var(menu1, menu2)
 
 		return self
 	else

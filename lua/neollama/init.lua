@@ -15,6 +15,7 @@ M.config = {
 	max_chats = 10,
 	hide_pasted_text = true,
 	local_port = "http://localhost:11434/api",
+	placeholder_language = "",
 	params = {
 		model = "llama3.1",
 		stream = false,

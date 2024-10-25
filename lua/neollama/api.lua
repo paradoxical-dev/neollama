@@ -146,7 +146,7 @@ M.response_split = function(response)
 			if string.match(str, "```.+") then
 				open_block = true
 			else
-				local language = "javascript"
+				local language = plugin.config.placeholder_language
 				str = str .. language
 				open_block = true
 			end
@@ -290,9 +290,9 @@ M.get_opts = function()
 				elseif param == "stop" then
 					table.insert(constructed_params.stop, vals[i + 1])
 				elseif
-					constructed_params[vals[i - 1]] == param
-					or vals[i - 1] == "stop"
-					or constructed_params[vals[i - 1]] == tonumber(param)
+						constructed_params[vals[i - 1]] == param
+						or vals[i - 1] == "stop"
+						or constructed_params[vals[i - 1]] == tonumber(param)
 				then
 					goto continue
 				elseif i == #vals - 2 or vals[i + 1] == nil then
