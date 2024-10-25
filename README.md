@@ -213,6 +213,7 @@ Neollama offers three input commands for quick access to certain functionalities
   If ypu attempt to save a chat and the `max_xhats` limit has been reached, you'll be prompted to overwrite an existing session which will then be lost.
 
 </details>
+
 > [!NOTE]
 >
 > All sessions are saved in the neollama data directory `~/.local/share/nvim/neollama/` in the `chats.lua` file. While these are stored as lua tables, their names are not bound to typical naming conventions.
