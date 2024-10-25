@@ -21,11 +21,13 @@ M.config = {
 		default_options = M.api.default_options,
 		extra_opts = M.api.extra_opts,
 	},
+	-- TODO: make each helper agent have configureable parameters
 	web_agent = {
 		enabled = true,
 		manual = true,
 		include_sources = true,
 		include_queries = true,
+		spinner_hl = { link = "Comment" },
 		user_agent =
 		"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36",
 		timeout = 15,
@@ -107,6 +109,7 @@ M.setup = function(user_config)
 	vim.api.nvim_set_hl(0, "NeollamaSessionMenuDefault", config.layout.session_picker.default_hl)
 	vim.api.nvim_set_hl(0, "NeollamaSessionMenuCurrent", config.layout.session_picker.current_hl)
 	vim.api.nvim_set_hl(0, "NeollamaModelMenu", config.layout.model_picker.hl)
+	vim.api.nvim_set_hl(0, "NeollamaSpinner", config.web_agent.spinner_hl)
 end
 
 -- Run the data files through the checker upon initialization

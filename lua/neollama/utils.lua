@@ -1,3 +1,6 @@
+local NuiText = require("nui.text")
+local NuiLine = require("nui.line")
+
 local M = {}
 
 local plugin
@@ -454,7 +457,12 @@ M.spinner = function(buffer, line)
 		vim.schedule(function()
 			if buffer and vim.api.nvim_buf_is_valid(buffer) then
 				local spinner_frame = spinner_frames[spinner_index]
-				vim.api.nvim_buf_set_lines(buffer, line, -1, false, { spinner_frame .. " Web search in progress..." })
+				local text = NuiText(spinner_frame .. " Web search in progress...", "NeollamaSpinner")
+				local spinner_line = NuiLine()
+
+				spinner_line:append(text)
+				spinner_line:render(buffer, -1, line)
+
 				spinner_index = (spinner_index % #spinner_frames) + 1
 			end
 		end)
@@ -469,8 +477,13 @@ M.spinner = function(buffer, line)
 			timer:stop()
 			timer:close()
 			timer = nil
+
 			vim.schedule(function()
-				vim.api.nvim_buf_set_lines(buffer, line, -1, false, { "  ", "  " })
+				local text = NuiText("  ")
+				local spinner_line = NuiLine()
+
+				spinner_line:append(text)
+				spinner_line:render(buffer, -1, line)
 			end)
 		end
 	end

@@ -14,19 +14,19 @@ local function format_search_results(search_results)
 	local formatted = [[]]
 	for index, value in ipairs(search_results) do
 		formatted = formatted
-			.. "\n\n"
-			.. "Option "
-			.. index
-			.. ": "
-			.. "\n"
-			.. "Title: "
-			.. value.title
-			.. "\n"
-			.. "Description: "
-			.. value.abstract
-			.. "\n"
-			.. "URL: "
-			.. value.url
+				.. "\n\n"
+				.. "Option "
+				.. index
+				.. ": "
+				.. "\n"
+				.. "Title: "
+				.. value.title
+				.. "\n"
+				.. "Description: "
+				.. value.abstract
+				.. "\n"
+				.. "URL: "
+				.. value.url
 	end
 
 	return formatted
@@ -56,6 +56,7 @@ M.generate_search_results = function(query, cb)
 	}):start()
 end
 
+-- TODO: expand this function to include more niche tags for sites using frameworks or other caveats
 local function is_visible_tag(tag)
 	local visible_tags = {
 		"p",
