@@ -44,6 +44,7 @@ To install neollama, simply use your prefferred package manager. For example, us
 ```
 
 ## Configuration
+
 **Default options:**
 ```lua
 {
@@ -82,7 +83,7 @@ To install neollama, simply use your prefferred package manager. For example, us
     },
   },
   web_agent = { -- See `Web Agent` section for more details
-    enabled = true,
+    enabled = true, -- Default option for new sessions
     manual = false,
     include_sources = true, -- Append sources or queries to chat response
     include_queries = true,
@@ -93,7 +94,7 @@ To install neollama, simply use your prefferred package manager. For example, us
     content_limit = 4000, -- Word count limit for scraped content
     retry_count = 3, -- Attempts to retry a single URL before continuing
     agent_models = { -- Customize the helper agents
-      use_current = true,
+      use_current = true, -- If true then the below config will be ignored
       buffer_agent = { model = "llama3.2" },
       reviewing_agent = {
         model = "llama3.2",
@@ -195,14 +196,16 @@ Neollama offers three input commands for quick access to certain functionalities
 
 ### **`/s`**
 
-Using `/s` from the input window you are able to save the current session. Saving the session saves all aspects of the current session including the current model with set parameters and the current chat history. If ypu attempt to save a chat and the `max_xhats` limit has been reached, you'll be prompted to overwrite an existing session which will then be lost.
+Using `/s` from the input window you are able to save the current session. Saving the session saves all aspects of the current session including the current model with set parameters and the current chat history. 
+
+If ypu attempt to save a chat and the `max_xhats` limit has been reached, you'll be prompted to overwrite an existing session which will then be lost.
 > [!TIP]
 >
 > All sessions are saved in the neollama data directory `~/.local/share/nvim/neollama/` in the `chats.lua` file. While these are stored as lua tables, their names are not bound to typical naming conventions.
 
-> [!WARN]
+> [!WARNING]
 > 
-> Additionally, it is not possible to set the max_chats to a lower value than the number of saved sessions, since there is no manual deletion.
+> It is not possible to set the max_chats to a lower value than the number of saved sessions, since there is no manual deletion.
 
 ### **`/c`**
 
@@ -213,7 +216,9 @@ The `/c` command allows you to enter the config editor for on-the-fly tuning of 
 The `/w` command toggles the web_agent. The current status of the web agent is denoted by the symbol next to the model name in the main chat window.
 
 ### Config Editor
-The config editor opens an interactive popup window which displays the set options for the current model. Each value will be set to the models default options (if not value is provided in the configuration) or, if no default is set and the model has no default value for the option then the plugins default will be used. To change a value, simply replace it's current value with the desired one. Then, when finished, simply use the change_config command set in the configuration and the new options will be applied
+The config editor opens an interactive popup window which displays the set options for the current model. Each value will be set to the models default options (if no value is provided in the configuration) or, if no default is set and the model has no default value, then the plugins default will be used. 
+
+To change a value, simply replace it's current value with the desired one. Then, when finished, use the change_config command set in the configuration and the new options will be applied
 
 (example video)
 
@@ -242,4 +247,18 @@ The integration agent is used to generate the output for the user, using the com
 
 Using these helper agents, we're able to enter a feedback loop of choosing a URL from a query, scraping it's content, deciding if the content is enough to answer the user's query, and either repeating the process with the next set of queries or generating the final output to be presented to the user.
 
+### Customization
+Each helper agent is completely customizeable; from the model used to the options applied to them. Although it is completely possible to have 3 larger models separate from the current model to perform these tasks, it is recommended for most users to stick to a max of two smaller (3b or lower) models. Personally, I found qwen2.5:3b to be perfect for the reviewing and buffer agents due to its high context window for inputs.
+
+By default, the web_agent first prompts the buffer agent on whether the user input will require a web search to fully answer. This is done using the `requires_current_data` prompt found in [prompts.lua](/lua/neollama/web_agent/prompts.lua). This feature can be disabled for efficency using the `manual` option in the `web_agent` configuration where every user input (while the agent is enabled) will instead be passed to the buffer agent using the `query_gen` prompt.
+
+The configurations default options are what I have tested to work best, but user's have the freedom to customize and test these options with any accepted value.
+
+### Schema
+The schema can best be visualized using a flow chart:
+(flow chart)
+
+For a better understanding of how the agent works under the hood, a good video can be found [here](https://www.youtube.com/watch?v=ZE6t9trCRnw). It is the video I used to better grasp the concept and take inspiration from to create a lua solution.
+
 ## Contributing
+
