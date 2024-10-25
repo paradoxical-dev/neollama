@@ -5,14 +5,14 @@ A UI meant for interacting with Ollama models from within Neovim.
 
 ![Preview](/preview.jpg)
 
-## Features
+# Features
 - Model switching with chat retention
 - Session saving and reloading
 - On the fly model configuration
 - Visual selection appended to prompt
 - Fully local built-in web agent with no external APIs
 
-## Dependencies
+# Dependencies
 - [nui.nvim](https://github.com/MunifTanjim/nui.nvim)
 - [plenary.nvim](https://github.com/nvim-lua/plenary.nvim)
 - (For web agent) gumbo
@@ -25,7 +25,7 @@ To install the `gumbo` module you can use luarocks:
 sudo luarocks --lua-version=5.1 install gumbo
 ```
 
-## Installation
+# Installation
 To install neollama, simply use your prefferred package manager. For example, using Lazy:
 ```lua
 {
@@ -45,7 +45,7 @@ To install neollama, simply use your prefferred package manager. For example, us
 }
 ```
 
-## Configuration
+# Configuration
 
 <details>
   <summary>Default options:</summary>
