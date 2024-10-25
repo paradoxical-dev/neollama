@@ -243,11 +243,11 @@ The config editor opens an interactive popup window which displays the set optio
 
 if no value is set for an option and the model has no default value, then the plugins default will be used. 
 
+![Config Editor example](/config_editor.jpg)
+
 To change a value, simply replace it's current value with the desired one. 
 
 When finishe editing use the change_config command set in the configuration and the new options will be applied
-
-![Config Editor example](/config_editor.jpg)
 
 > [!NOTE]
 >
@@ -257,24 +257,24 @@ When finishe editing use the change_config command set in the configuration and 
 
 # Web Agent
 
-### Overview
+## Overview
 The web agent is created using sequential model calls with predefined perameters and system prompts. 
 
 There are three main helper agents used:
 
-**Buffer agent:**
+### Buffer agent:
 
 Responsible for deciding if the user's query will require a web search (if manual is set to false) and generating the proper queries for the search. 
 
 Additionally, the results from the ddgr command, which uses the generated queries, will be fed to this model and will return the decided best URL based on the user input.
 
-**Reviewing agent:**
+### Reviewing agent:
 
 Used with two main goals:
   - To compile the scraped website content into relevant facts related to the user's input
   - Decide if the compiled content is adequate to answer. 
 
-**Integration agent:**
+### Integration agent:
 
 Generates the output for the user, using the compiled information. 
 
