@@ -212,11 +212,10 @@ Neollama offers three input commands for quick access to certain functionalities
 
   If ypu attempt to save a chat and the `max_xhats` limit has been reached, you'll be prompted to overwrite an existing session which will then be lost.
 
-  > [!NOTE]
-  >
-  > All sessions are saved in the neollama data directory `~/.local/share/nvim/neollama/` in the `chats.lua` file. While these are stored as lua tables, their names are not bound to typical naming conventions.
-
 </details>
+> [!NOTE]
+>
+> All sessions are saved in the neollama data directory `~/.local/share/nvim/neollama/` in the `chats.lua` file. While these are stored as lua tables, their names are not bound to typical naming conventions.
 
 > [!WARNING]
 > 
@@ -246,15 +245,13 @@ if no value is set for an option and the model has no default value, then the pl
 
 ![Config Editor example](/config_editor.jpg)
 
-To change a value, simply replace it's current value with the desired one. 
-
-When finishe editing use the change_config command set in the configuration and the new options will be applied
+To change a value, simply replace it's current value with the desired one. When finished editing, use the change_config command set in the configuration and the new options will be applied.
 
 > [!NOTE]
 >
 > All extra options will be defaulted to an empty string unless they are set in the configuration. To edit these optiosn from the editor enter the value within the string.
 >
-> If the value already has a set value be sure to change the value in the extra_options table not the default_options table
+> If the value already has a set value be sure to change the value in the extra_options table not the default_options table.
 
 # Web Agent
 
