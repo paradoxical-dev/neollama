@@ -205,6 +205,7 @@ Neollama offers three input commands for quick access to certain functionalities
   Saving the session saves all aspects of the current session including the current model with set parameters and the current chat history. 
 
   If ypu attempt to save a chat and the `max_xhats` limit has been reached, you'll be prompted to overwrite an existing session which will then be lost.
+</details>
 > [!TIP]
 >
 > All sessions are saved in the neollama data directory `~/.local/share/nvim/neollama/` in the `chats.lua` file. While these are stored as lua tables, their names are not bound to typical naming conventions.
@@ -212,15 +213,25 @@ Neollama offers three input commands for quick access to certain functionalities
 > [!WARNING]
 > 
 > It is not possible to set the max_chats to a lower value than the number of saved sessions, since there is no manual deletion.
-</details>
 
 ### **`/c`**
+<details>
+  <summary>Config Editor</summary>
+  
+  The `/c` command allows you to enter the config editor for on-the-fly tuning of model parameters. 
 
-The `/c` command allows you to enter the config editor for on-the-fly tuning of model parameters. See [Config Editor](#config-editor) section for more details.
+  See [Config Editor](#config-editor) section for more details.
+  
+</details>
 
 ### **`/w`**
+<details>
+  <summary>Toggle web agent</summary>
 
-The `/w` command toggles the web_agent. The current status of the web agent is denoted by the symbol next to the model name in the main chat window.
+  
+  The `/w` command toggles the web_agent. The current status of the web agent is denoted by the symbol next to the model name in the main chat window.
+  
+</details>
 
 ### Config Editor
 The config editor opens an interactive popup window which displays the set options for the current model. Each value will be set to the models default options (if no value is provided in the configuration) or, if no default is set and the model has no default value, then the plugins default will be used. 
