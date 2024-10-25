@@ -182,7 +182,7 @@ To install neollama, simply use your prefferred package manager. For example, us
   },
 }
 ```
-> NOTE
+> [!NOTE]
 > 
 > Any helper agent which is set will not have the default options applied and will have to be explicitly set
 
@@ -191,10 +191,10 @@ To install neollama, simply use your prefferred package manager. For example, us
 ### Input Commands
 Neollama offers three input commands for quick access to certain functionalities:
 
-### /s
+### **`/s`**
 
 Using `/s` from the input window you are able to save the current session. Saving the session saves all aspects of the current session including the current model with set parameters and the current chat history. If ypu attempt to save a chat and the `max_xhats` limit has been reached, you'll be prompted to overwrite an existing session which will then be lost.
-> NOTE
+> [!NOTE]
 >
 > All sessions are saved in the neollama data directory `~/.local/share/nvim/neollama/` in the `chats.lua` file. While these are stored as lua tables, their names are not bound to typical naming conventions.
 >
