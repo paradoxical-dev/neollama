@@ -436,7 +436,6 @@ end
 
 -- TEXT/LAYOUT MANIPULATION --
 
--- TODO: make spinner customizable using NuiText / NuiLine
 M.spinner = function(buffer, line)
 	local spinner_frames = {
 		"⠋",

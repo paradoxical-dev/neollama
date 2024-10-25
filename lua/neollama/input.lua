@@ -151,7 +151,6 @@ M.new = function()
 			end
 
 			-- handle web agent command
-			-- TODO: add some kind of notification to signal whether the web_agent is active or not
 			if value == "/w" then
 				plugin.config.web_agent.enabled = not plugin.config.web_agent.enabled
 
@@ -226,7 +225,6 @@ M.new = function()
 					return
 				end
 
-				-- TODO: create spinner to show progress of web search
 				if plugin.config.web_agent.enabled then
 					local stop_spinner = utils.spinner(plugin.popup.bufnr, current_line_count + 1)
 					web_agent.buffer_agent(value, function(res)
@@ -250,43 +248,6 @@ M.new = function()
 				-- standard model call if none apply
 				model_call()
 			end, 0)
-
-			-- if plugin.config.web_agent.enabled and plugin.config.web_agent.manual then
-			-- 	local stop_spinner = utils.spinner(plugin.popup.bufnr, current_line_count + 1)
-			-- 	web_agent.query_gen(value, function(res)
-			-- 		web_agent.feedback_loop(value, res, stop_spinner)
-			-- 		utils.setTimeout(0.5, function()
-			-- 			ui_update()
-			-- 			utils.write_log(web_agent.log_info)
-			-- 		end, function()
-			-- 			return API.done
-			-- 		end)
-			-- 	end)
-			-- 	return
-			-- end
-			--
-			-- -- TODO: create spinner to show progress of web search
-			-- if plugin.config.web_agent.enabled then
-			-- 	local stop_spinner = utils.spinner(plugin.popup.bufnr, current_line_count + 1)
-			-- 	web_agent.buffer_agent(value, function(res)
-			-- 		if res.needs_web_search then
-			-- 			web_agent.feedback_loop(value, res, stop_spinner)
-			-- 			utils.setTimeout(0.5, function()
-			-- 				ui_update()
-			-- 				utils.write_log(web_agent.log_info)
-			-- 			end, function()
-			-- 				return API.done
-			-- 			end)
-			-- 			return
-			-- 		else
-			-- 			model_call()
-			-- 			return
-			-- 		end
-			-- 	end)
-			-- 	return
-			-- end
-
-			-- model_call()
 		end,
 	})
 

@@ -312,6 +312,10 @@ M.popup = function()
 	setmetatable(self, { __index = M })
 
 	local text = NuiText(" " .. _G.NeollamaModel .. " ", "NeollamaWindowTitle")
+	if plugin.config.web_agent.enabled then
+		text = NuiText("  " .. _G.NeollamaModel .. " 󰖟  ", "NeollamaWindowTitle")
+	end
+
 	self.popup = Popup({
 		relative = "editor",
 		enter = true,

@@ -21,7 +21,6 @@ M.config = {
 		default_options = M.api.default_options,
 		extra_opts = M.api.extra_opts,
 	},
-	-- TODO: make each helper agent have configureable parameters
 	web_agent = {
 		enabled = true,
 		manual = true,
