@@ -1,4 +1,4 @@
-![Logo](/better_logo.png)
+ ![Logo](/better_logo.png)
 
 # neollama
 A UI meant for interacting with Ollama models from within Neovim.
@@ -241,9 +241,11 @@ Neollama offers three input commands for quick access to certain functionalities
 ### Config Editor
 The config editor opens an interactive popup window which displays the set options for the current model. 
 
-Each value will be set to the models default options (if no value is provided in the configuration) or, if no default is set and the model has no default value, then the plugins default will be used. 
+if no value is set for an option and the model has no default value, then the plugins default will be used. 
 
-To change a value, simply replace it's current value with the desired one. Then, when finished, use the change_config command set in the configuration and the new options will be applied
+To change a value, simply replace it's current value with the desired one. 
+
+When finishe editing use the change_config command set in the configuration and the new options will be applied
 
 ![Config Editor example](/config_editor.jpg)
 
@@ -262,23 +264,21 @@ There are three main helper agents used:
 
 **Buffer agent:**
 
-The buffer agent is responsible for deciding if the user's query will require a web search (if manual is set to false) and generating the proper queries for the search. 
+Responsible for deciding if the user's query will require a web search (if manual is set to false) and generating the proper queries for the search. 
 
 Additionally, the results from the ddgr command, which uses the generated queries, will be fed to this model and will return the decided best URL based on the user input.
 
 **Reviewing agent:**
 
-The reviewing agent will be used with two main goals:
+Used with two main goals:
   - To compile the scraped website content into relevant facts related to the user's input
   - Decide if the compiled content is adequate to answer. 
 
 **Integration agent:**
 
-The integration agent is used to generate the output for the user, using the compiled information. 
+Generates the output for the user, using the compiled information. 
 
 It's response will be treated the same as the standard model call and will be appended to the current sessions chat history.
-
-Using these helper agents, we're able to enter a feedback loop of choosing a URL from a query, scraping it's content, deciding if the content is enough to answer the user's query, and either repeating the process with the next set of queries or generating the final output to be presented to the user.
 
 ### Customization
 Each helper agent is completely customizeable; from the model used to the options applied to them.
@@ -287,16 +287,20 @@ It is recommended for most users to stick to a max of two smaller (3b or lower) 
 
 By default, the web_agent first prompts the buffer agent on whether the user input will require a web search to fully answer.
 
-This is done using the `requires_current_data` prompt found in [prompts.lua](/lua/neollama/web_agent/prompts.lua). This feature can be disabled for efficency using the `manual` option in the `web_agent` configuration where every user input (while the agent is enabled) will instead be passed to the buffer agent using the `query_gen` prompt.
+This is done using the `requires_current_data` prompt found in [prompts.lua](/lua/neollama/web_agent/prompts.lua). 
+
+This feature can be disabled for efficency using the `manual` option in the `web_agent` configuration where every user input (while the agent is enabled) will instead be passed to the buffer agent using the `query_gen` prompt.
 
 The configurations default options are what I have tested to work best, but user's have the freedom to customize and test these options with any accepted value.
 
 ### Schema
-The schema can best be visualized using a flow chart:
+The schema is best visualized using a flow chart:
 
 ![Schema flow chart](/schema.png)
 
-For a better understanding of how the agent works under the hood, a good video can be found [here](https://www.youtube.com/watch?v=ZE6t9trCRnw). It is the video I used to better grasp the concept and take inspiration from to create a lua solution.
+For a better understanding of how the agent works under the hood, a good video can be found [here](https://www.youtube.com/watch?v=ZE6t9trCRnw).
+
+It is the video I used to better grasp the concept and take inspiration from to create a lua solution.
 
 ## Contributing
 
