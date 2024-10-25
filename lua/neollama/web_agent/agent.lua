@@ -177,9 +177,6 @@ M.integration_agent = function(user_prompt, compiled_content, sources, queries)
 			{ role = "user",   content = compiled_content },
 		},
 		stream = plugin.config.params.stream,
-		options = {
-			num_ctx = 4096,
-		},
 	}
 	if agent_config.use_current == false and agent_config.integration_agent.options ~= nil then
 		params.options = agent_config.integration_agent.options
@@ -343,11 +340,6 @@ M.compilation_agent = function(user_prompt, content, cb)
 			{ role = "user",   content = content },
 		},
 		stream = false,
-		options = {
-			num_ctx = 4096,
-			temperature = 0.2,
-			top_p = 0.1,
-		},
 	}
 	if agent_config.use_current == false and agent_config.reviewing_agent.options ~= nil then
 		params.options = agent_config.reviewing_agent.options
@@ -408,9 +400,6 @@ M.res_check_agent = function(user_prompt, content, cb)
 		},
 		format = "json",
 		stream = false,
-		options = {
-			num_ctx = 4096,
-		},
 	}
 	if agent_config.use_current == false and agent_config.reviewing_agent.options ~= nil then
 		params.options = agent_config.reviewing_agent.options

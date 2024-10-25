@@ -35,8 +35,20 @@ M.config = {
 		agent_models = {
 			use_current = true,
 			buffer_agent = { model = "llama3.2" },
-			reviewing_agent = { model = "llama3.2" },
-			integration_agent = { model = "llama3.1" },
+			reviewing_agent = {
+				model = "llama3.2",
+				options = {
+					num_ctx = 4096,
+					temperature = 0.2,
+					top_p = 0.1,
+				},
+			},
+			integration_agent = {
+				model = "llama3.1",
+				options = {
+					num_ctx = 4096,
+				},
+			},
 		},
 	},
 	layout = {

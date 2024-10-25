@@ -150,7 +150,6 @@ M.retry_count = 1
 M.failed_sites = {}
 
 -- Grabs the text from the website and passes to callback
--- TODO: add better retry handling. currently halts processes of retry limit is reached
 local function request_site(url, cb)
 	local args = {
 		"--request",
