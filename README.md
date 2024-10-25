@@ -163,7 +163,7 @@ Example configuration:
 ### Input Commands
 Neollama offers three input commands for quick access to certain functionalities:
 
-- **`/s`**
+**`/s`**
 
 Using `/s` from the input window you are able to save the current session. Saving the session saves all aspects of the current session including the current model with set parameters and the current chat history. If ypu attempt to save a chat and the `max_xhats` limit has been reached, you'll be prompted to overwrite an existing session which will then be lost.
 >**NOTE**
@@ -172,11 +172,11 @@ Using `/s` from the input window you are able to save the current session. Savin
 >
 >Additionally, it is not possible to set the max_chats to a lower value than the number of saved sessions, since there is no manual deletion.
 
-- **`/c`**
+**`/c`**
 
 The `/c` command allows you to enter the config editor for on-the-fly tuning of model parameters. See Config Editor section for more details.
 
-- **`/w`**
+**`/w`**
 
 The `/w` command toggles the web_agent. The current status of the web agent is denoted by the symbol next to the model name in the main chat window.
 
@@ -186,17 +186,17 @@ The `/w` command toggles the web_agent. The current status of the web agent is d
 
 ### Overview
 The web agent is created using sequential model calls with predefined perameters and system prompts. There are three main helper agents used:
-- **Buffer agent**
+**Buffer agent:**
 
 The buffer agent is responsible for deciding if the user's query will require a web search (if manual is set to false) and generating the proper queries for the search. Additionally, the results from the ddgr command, which uses the generated queries, will be fed to this model and will return the decided best URL based on the user input.
 
-- **Reviewing agent**
+**Reviewing agent:**
 
 The reviewing agent will be used with two main goals: 
   - To compile the scraped website content into relevant facts related to the user's input
   - Decide if the compiled content is adequate to answer. 
 
-- **Integration agent**
+**Integration agent:**
 
 The integration agent is used to generate the output for the user, using the compiled information. It's response will be treated the same as the standard model call and will be appended to the current sessions chat history.
 
