@@ -79,6 +79,56 @@ local function model_call()
 	end)
 end
 
+local function handle_input_commands(value)
+	if value == "/s" then
+		plugin.layout:hide()
+
+		local user_data = utils.chat_data()
+
+		if user_data.num_chats == plugin.config.max_chats then
+			print("Max sessions reached. Please select a session to overwrite.")
+			local m = LayoutHandler.overwrite_menu()
+			m.menu:mount()
+			return
+		end
+
+		local i = M.save_prompt(user_data)
+		i.input:mount()
+		return
+	end
+
+	-- handle config editor command
+	if value == "/c" then
+		plugin.layout:hide()
+
+		local p = LayoutHandler.param_viewer()
+		p.popup:mount()
+		LayoutHandler.config_buf = p.popup
+
+		table.insert(LayoutHandler.window_selection, LayoutHandler.config_buf.winid)
+		utils.set_keymaps()
+		vim.api.nvim_buf_set_name(LayoutHandler.config_buf.bufnr, "neollama-config.lua")
+
+		local buf = LayoutHandler.config_buf.bufnr
+		local opts_str = vim.inspect(API.params.opts)
+		local extra_opts = vim.inspect(API.extra_opts)
+
+		vim.api.nvim_buf_set_lines(buf, 0, -1, false, utils.param_format(opts_str))
+		local current_lines = vim.api.nvim_buf_line_count(buf)
+		vim.api.nvim_buf_set_lines(buf, current_lines + 1, current_lines + 1, false, utils.param_format(extra_opts))
+
+		return
+	end
+
+	if value == "/w" then
+		plugin.config.web_agent.enabled = not plugin.config.web_agent.enabled
+
+		LayoutHandler.remount()
+		utils.reformat_session(API.params.messages)
+		return
+	end
+end
+
 M.new = function()
 	local self = {}
 	setmetatable(self, { __index = M })
@@ -100,62 +150,10 @@ M.new = function()
 		prompt = plugin.config.layout.input.icon .. " ",
 		default_value = nil,
 		on_close = function() end,
-		on_submit = function(value) -- Inserts user input accordingly while calling the ollama client with the user input
-			-- handle save command
-			-- TODO: make external function to handle input commands and web agent calls for readability
-			if value == "/s" then
-				plugin.layout:hide()
-
-				local user_data = utils.chat_data()
-
-				if user_data.num_chats == plugin.config.max_chats then
-					print("Max sessions reached. Please select a session to overwrite.")
-					local m = LayoutHandler.overwrite_menu()
-					m.menu:mount()
-					return
-				end
-
-				local i = M.save_prompt(user_data)
-				i.input:mount()
-				return
-			end
-
-			-- handle config editor command
-			-- TODO: make sure chat history is replaced when config editor is closed
-			if value == "/c" then
-				plugin.layout:hide()
-
-				local p = LayoutHandler.param_viewer()
-				p.popup:mount()
-				LayoutHandler.config_buf = p.popup
-
-				table.insert(LayoutHandler.window_selection, LayoutHandler.config_buf.winid)
-				utils.set_keymaps()
-				vim.api.nvim_buf_set_name(LayoutHandler.config_buf.bufnr, "neollama-config.lua")
-
-				local buf = LayoutHandler.config_buf.bufnr
-				local opts_str = vim.inspect(API.params.opts)
-				local extra_opts = vim.inspect(API.extra_opts)
-
-				vim.api.nvim_buf_set_lines(buf, 0, -1, false, utils.param_format(opts_str))
-				local current_lines = vim.api.nvim_buf_line_count(buf)
-				vim.api.nvim_buf_set_lines(
-					buf,
-					current_lines + 1,
-					current_lines + 1,
-					false,
-					utils.param_format(extra_opts)
-				)
-
-				return
-			end
-
-			-- handle web agent command
-			if value == "/w" then
-				plugin.config.web_agent.enabled = not plugin.config.web_agent.enabled
-
-				LayoutHandler.remount()
-				utils.reformat_session(API.params.messages)
+		on_submit = function(value)
+			-- handle commands
+			if value == "/w" or value == "/c" or value == "/s" then
+				handle_input_commands(value)
 				return
 			end
 
@@ -210,7 +208,7 @@ M.new = function()
 					current_line_count = current_line_count - 1
 				end
 
-				-- handle web agent calling if necessary
+				-- handle manual web agent calling
 				if plugin.config.web_agent.enabled and plugin.config.web_agent.manual then
 					local stop_spinner = utils.spinner(plugin.popup.bufnr, current_line_count)
 					web_agent.query_gen(value, function(res)
@@ -225,6 +223,7 @@ M.new = function()
 					return
 				end
 
+				-- handle assisted web agent calling
 				if plugin.config.web_agent.enabled then
 					local stop_spinner = utils.spinner(plugin.popup.bufnr, current_line_count + 1)
 					web_agent.buffer_agent(value, function(res)

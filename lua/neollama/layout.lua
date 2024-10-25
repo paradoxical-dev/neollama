@@ -751,6 +751,7 @@ M.remount = function()
 		plugin.layout:mount()
 
 		M.update_window_selection()
+		utils.set_keymaps()
 
 		if vim.api.nvim_buf_line_count(plugin.popup.bufnr) <= 1 and API.params.messages ~= nil then
 			utils.reformat_session(API.params.messages)

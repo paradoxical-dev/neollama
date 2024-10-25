@@ -218,6 +218,7 @@ M.change_config = function(current_buffer)
 
 	LayoutHandler.update_window_selection()
 	M.set_keymaps()
+	M.reformat_session(API.params.messages)
 end
 
 -- Reads the config buffer and transforms to a string before loading and returning the strings as seperate table values
