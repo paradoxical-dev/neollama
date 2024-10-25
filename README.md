@@ -10,7 +10,7 @@ A UI meant for interacting with Ollama models from within Neovim.
 - Session saving and reloading
 - On the fly model configuration
 - Visual selection appended to prompt
-- Built-in web agent
+- Fully local built-in web agent with no external APIs
 
 ## Dependencies
 - [nui.nvim](https://github.com/MunifTanjim/nui.nvim)
@@ -47,7 +47,8 @@ To install neollama, simply use your prefferred package manager. For example, us
 
 ## Configuration
 
-**Default options:**
+<details>
+  <summary>**Default options:**</summary>
 ```lua
 {
   autoscroll = true,
@@ -159,8 +160,10 @@ To install neollama, simply use your prefferred package manager. For example, us
   },
 }
 ```
+</details>
 
-**Example configuration:**
+<details>
+  <summary>**Example configuration:**</summary>
 ```lua
 {
   params = {
@@ -187,6 +190,8 @@ To install neollama, simply use your prefferred package manager. For example, us
   },
 }
 ```
+</details>
+
 > [!NOTE]
 > 
 > Any helper agent which is set will not have the default options applied and will have to be explicitly set
@@ -196,9 +201,8 @@ To install neollama, simply use your prefferred package manager. For example, us
 ### Input Commands
 Neollama offers three input commands for quick access to certain functionalities:
 
-### **`/s`**
 <details>
-  <summary>Save command</summary>
+  <summary>### **`/s`**</summary>
   
   Using `/s` from the input window you are able to save the current session. 
   
