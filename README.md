@@ -240,7 +240,7 @@ The config editor opens an interactive popup window which displays the set optio
 
 To change a value, simply replace it's current value with the desired one. Then, when finished, use the change_config command set in the configuration and the new options will be applied
 
-(example video)
+![Config Editor example](/config_editor.jpg)
 
 > [!NOTE]
 >
