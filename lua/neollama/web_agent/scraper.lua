@@ -1,6 +1,5 @@
 local gumbo = require("gumbo")
 local job = require("plenary.job")
--- local plugin = require("neollama.init")
 
 local M = {}
 local plugin
@@ -90,6 +89,9 @@ local function is_visible_tag(tag)
 		"dl",
 		"dt",
 		"dd",
+		"header",
+		"footer",
+		"nav",
 	}
 	for _, visible_tag in ipairs(visible_tags) do
 		if tag == visible_tag then
@@ -183,6 +185,11 @@ local function request_site(url, cb)
 		on_exit = function(j, return_val)
 			if return_val == 0 then
 				local html = table.concat(j:result(), "\n")
+				if #html == 0 then
+					M.retry_count = 1
+					cb(false)
+					return
+				end
 				local document = gumbo.parse(html)
 				local dirty_text = extract_text(document.body)
 				local cleaned_text = clean_text(dirty_text)
