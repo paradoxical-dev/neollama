@@ -22,8 +22,10 @@ M.log_info = {}
 M.buffer_agent = function(user_prompt, cb)
 	local res
 	local model
-	if not plugin.config.web_agent.use_current then
-		model = plugin.config.web_agent.buffer_agent
+	local agent_config = plugin.config.web_agent.agent_models
+
+	if not agent_config.use_current then
+		model = agent_config.buffer_agent.model
 	end
 
 	local port = plugin.config.local_port .. "/chat"
@@ -31,11 +33,15 @@ M.buffer_agent = function(user_prompt, cb)
 		model = model or _G.NeollamaModel,
 		messages = {
 			{ role = "system", content = prompts.requires_current_data },
-			{ role = "user", content = user_prompt },
+			{ role = "user",   content = user_prompt },
 		},
 		format = "json",
 		stream = false,
 	}
+	if agent_config.use_current == false and agent_config.buffer_agent.options ~= nil then
+		params.options = agent_config.buffer_agent.options
+	end
+
 	local args = {
 		"--silent",
 		"--show-error",
@@ -75,8 +81,10 @@ end
 M.query_gen = function(user_prompt, cb)
 	local res
 	local model
-	if not plugin.config.web_agent.use_current then
-		model = plugin.config.web_agent.buffer_agent
+	local agent_config = plugin.config.web_agent.agent_models
+
+	if not agent_config.use_current then
+		model = agent_config.buffer_agent.model
 	end
 
 	local port = plugin.config.local_port .. "/chat"
@@ -84,11 +92,15 @@ M.query_gen = function(user_prompt, cb)
 		model = model or _G.NeollamaModel,
 		messages = {
 			{ role = "system", content = prompts.generate_query },
-			{ role = "user", content = user_prompt },
+			{ role = "user",   content = user_prompt },
 		},
 		format = "json",
 		stream = false,
 	}
+	if agent_config.use_current == false and agent_config.buffer_agent.options ~= nil then
+		params.options = agent_config.buffer_agent.options
+	end
+
 	local args = {
 		"--silent",
 		"--show-error",
@@ -128,15 +140,15 @@ end
 local function append_sources(response, sources, queries)
 	if plugin.config.web_agent.include_sources and plugin.config.web_agent.include_queries then
 		response = response
-			.. "\n"
-			.. "\n"
-			.. "**Sources:**"
-			.. "\n"
-			.. table.concat(sources, "\n")
-			.. "\n\n"
-			.. "**Queries:**"
-			.. "\n"
-			.. table.concat(queries, "\n")
+				.. "\n"
+				.. "\n"
+				.. "**Sources:**"
+				.. "\n"
+				.. table.concat(sources, "\n")
+				.. "\n\n"
+				.. "**Queries:**"
+				.. "\n"
+				.. table.concat(queries, "\n")
 	elseif plugin.config.web_agent.include_sources then
 		response = response .. "\n" .. "\n" .. "**Sources:**" .. "\n" .. table.concat(sources, "\n")
 	elseif plugin.config.web_agent.include_queries then
@@ -151,8 +163,10 @@ end
 M.integration_agent = function(user_prompt, compiled_content, sources, queries)
 	local res
 	local model
-	if not plugin.config.web_agent.use_current then
-		model = plugin.config.web_agent.integration_agent
+	local agent_config = plugin.config.web_agent.agent_models
+
+	if not agent_config.use_current then
+		model = agent_config.integration_agent.model
 	end
 
 	local port = plugin.config.local_port .. "/chat"
@@ -160,13 +174,17 @@ M.integration_agent = function(user_prompt, compiled_content, sources, queries)
 		model = model or _G.NeollamaModel,
 		messages = {
 			{ role = "system", content = prompts.integration_prompt(user_prompt) },
-			{ role = "user", content = compiled_content },
+			{ role = "user",   content = compiled_content },
 		},
 		stream = plugin.config.params.stream,
 		options = {
 			num_ctx = 4096,
 		},
 	}
+	if agent_config.use_current == false and agent_config.integration_agent.options ~= nil then
+		params.options = agent_config.integration_agent.options
+	end
+
 	local args = {
 		"--silent",
 		"--show-error",
@@ -252,8 +270,10 @@ end
 M.site_select = function(user_prompt, search_results, failed_sites, used_sources, cb)
 	local res
 	local model
-	if not plugin.config.web_agent.use_current then
-		model = plugin.config.web_agent.buffer_agent
+	local agent_config = plugin.config.web_agent.agent_models
+
+	if not agent_config.use_current then
+		model = agent_config.buffer_agent.model
 	end
 
 	local port = plugin.config.local_port .. "/chat"
@@ -261,11 +281,15 @@ M.site_select = function(user_prompt, search_results, failed_sites, used_sources
 		model = model or _G.NeollamaModel,
 		messages = {
 			{ role = "system", content = prompts.site_select(user_prompt, failed_sites, used_sources) },
-			{ role = "user", content = search_results },
+			{ role = "user",   content = search_results },
 		},
 		stream = false,
 		format = "json",
 	}
+	if agent_config.use_current == false and agent_config.buffer_agent.options ~= nil then
+		params.options = agent_config.buffer_agent.options
+	end
+
 	local args = {
 		"--silent",
 		"--show-error",
@@ -305,8 +329,10 @@ end
 M.compilation_agent = function(user_prompt, content, cb)
 	local res
 	local model
-	if not plugin.config.web_agent.use_current then
-		model = plugin.config.web_agent.reviewing_agent
+	local agent_config = plugin.config.web_agent.agent_models
+
+	if not agent_config.use_current then
+		model = agent_config.reviewing_agent.model
 	end
 
 	local port = plugin.config.local_port .. "/chat"
@@ -314,7 +340,7 @@ M.compilation_agent = function(user_prompt, content, cb)
 		model = model or _G.NeollamaModel,
 		messages = {
 			{ role = "system", content = prompts.compile_info(user_prompt) },
-			{ role = "user", content = content },
+			{ role = "user",   content = content },
 		},
 		stream = false,
 		options = {
@@ -323,6 +349,10 @@ M.compilation_agent = function(user_prompt, content, cb)
 			top_p = 0.1,
 		},
 	}
+	if agent_config.use_current == false and agent_config.reviewing_agent.options ~= nil then
+		params.options = agent_config.reviewing_agent.options
+	end
+
 	local args = {
 		"--silent",
 		"--show-error",
@@ -363,8 +393,10 @@ end
 M.res_check_agent = function(user_prompt, content, cb)
 	local res
 	local model
-	if not plugin.config.web_agent.use_current then
-		model = plugin.config.web_agent.reviewing_agent
+	local agent_config = plugin.config.web_agent.agent_models
+
+	if not agent_config.use_current then
+		model = agent_config.reviewing_agent.model
 	end
 
 	local port = plugin.config.local_port .. "/chat"
@@ -372,7 +404,7 @@ M.res_check_agent = function(user_prompt, content, cb)
 		model = model or _G.NeollamaModel,
 		messages = {
 			{ role = "system", content = prompts.response_checker_prompt(user_prompt) },
-			{ role = "user", content = content },
+			{ role = "user",   content = content },
 		},
 		format = "json",
 		stream = false,
@@ -380,6 +412,10 @@ M.res_check_agent = function(user_prompt, content, cb)
 			num_ctx = 4096,
 		},
 	}
+	if agent_config.use_current == false and agent_config.reviewing_agent.options ~= nil then
+		params.options = agent_config.reviewing_agent.options
+	end
+
 	local args = {
 		"--silent",
 		"--show-error",

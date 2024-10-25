@@ -108,7 +108,7 @@ M.new = function()
 
 				local user_data = utils.chat_data()
 
-				if user_data.num_chats == user_data.max_chats then
+				if user_data.num_chats == plugin.config.max_chats then
 					print("Max sessions reached. Please select a session to overwrite.")
 					local m = LayoutHandler.overwrite_menu()
 					m.menu:mount()
