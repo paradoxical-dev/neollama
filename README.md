@@ -165,6 +165,7 @@ To install neollama, simply use your prefferred package manager. For example, us
 
 <details>
   <summary>Example configuration:</summary>
+  
   ```lua
   {
     params = {
@@ -203,7 +204,7 @@ To install neollama, simply use your prefferred package manager. For example, us
 Neollama offers three input commands for quick access to certain functionalities:
 
 <details>
-  <summary>### **`/s`**</summary>
+  <summary>Save command</summary>
   
   Using `/s` from the input window you are able to save the current session. 
   
@@ -220,7 +221,6 @@ Neollama offers three input commands for quick access to certain functionalities
 > 
 > It is not possible to set the max_chats to a lower value than the number of saved sessions, since there is no manual deletion.
 
-### **`/c`**
 <details>
   <summary>Config Editor</summary>
 
@@ -231,17 +231,17 @@ Neollama offers three input commands for quick access to certain functionalities
   
 </details>
 
-### **`/w`**
 <details>
   <summary>Toggle web agent</summary>
 
-  
   The `/w` command toggles the web_agent. The current status of the web agent is denoted by the symbol next to the model name in the main chat window.
   
 </details>
 
 ### Config Editor
-The config editor opens an interactive popup window which displays the set options for the current model. Each value will be set to the models default options (if no value is provided in the configuration) or, if no default is set and the model has no default value, then the plugins default will be used. 
+The config editor opens an interactive popup window which displays the set options for the current model. 
+
+Each value will be set to the models default options (if no value is provided in the configuration) or, if no default is set and the model has no default value, then the plugins default will be used. 
 
 To change a value, simply replace it's current value with the desired one. Then, when finished, use the change_config command set in the configuration and the new options will be applied
 
@@ -249,33 +249,45 @@ To change a value, simply replace it's current value with the desired one. Then,
 
 > [!NOTE]
 >
-> All extra optiosn will be defaulted to an empty string unless they are set in the configuration. To edit these optiosn from the editor enter the value within the string. if the value already has a set value be sure to change the value in the extra_options table not the default_options table
+> All extra options will be defaulted to an empty string unless they are set in the configuration. To edit these optiosn from the editor enter the value within the string.
+>
+> If the value already has a set value be sure to change the value in the extra_options table not the default_options table
 
 ## Web Agent
 
 ### Overview
-The web agent is created using sequential model calls with predefined perameters and system prompts. There are three main helper agents used:
+The web agent is created using sequential model calls with predefined perameters and system prompts. 
+
+There are three main helper agents used:
 
 **Buffer agent:**
 
-The buffer agent is responsible for deciding if the user's query will require a web search (if manual is set to false) and generating the proper queries for the search. Additionally, the results from the ddgr command, which uses the generated queries, will be fed to this model and will return the decided best URL based on the user input.
+The buffer agent is responsible for deciding if the user's query will require a web search (if manual is set to false) and generating the proper queries for the search. 
+
+Additionally, the results from the ddgr command, which uses the generated queries, will be fed to this model and will return the decided best URL based on the user input.
 
 **Reviewing agent:**
 
-The reviewing agent will be used with two main goals: 
+The reviewing agent will be used with two main goals:
   - To compile the scraped website content into relevant facts related to the user's input
   - Decide if the compiled content is adequate to answer. 
 
 **Integration agent:**
 
-The integration agent is used to generate the output for the user, using the compiled information. It's response will be treated the same as the standard model call and will be appended to the current sessions chat history.
+The integration agent is used to generate the output for the user, using the compiled information. 
+
+It's response will be treated the same as the standard model call and will be appended to the current sessions chat history.
 
 Using these helper agents, we're able to enter a feedback loop of choosing a URL from a query, scraping it's content, deciding if the content is enough to answer the user's query, and either repeating the process with the next set of queries or generating the final output to be presented to the user.
 
 ### Customization
-Each helper agent is completely customizeable; from the model used to the options applied to them. Although it is completely possible to have 3 larger models separate from the current model to perform these tasks, it is recommended for most users to stick to a max of two smaller (3b or lower) models. Personally, I found qwen2.5:3b to be perfect for the reviewing and buffer agents due to its high context window for inputs.
+Each helper agent is completely customizeable; from the model used to the options applied to them.
 
-By default, the web_agent first prompts the buffer agent on whether the user input will require a web search to fully answer. This is done using the `requires_current_data` prompt found in [prompts.lua](/lua/neollama/web_agent/prompts.lua). This feature can be disabled for efficency using the `manual` option in the `web_agent` configuration where every user input (while the agent is enabled) will instead be passed to the buffer agent using the `query_gen` prompt.
+It is recommended for most users to stick to a max of two smaller (3b or lower) models for the helper agents. Personally, I found qwen2.5:3b to be perfect for the reviewing and buffer agents due to its high context window for inputs.
+
+By default, the web_agent first prompts the buffer agent on whether the user input will require a web search to fully answer.
+
+This is done using the `requires_current_data` prompt found in [prompts.lua](/lua/neollama/web_agent/prompts.lua). This feature can be disabled for efficency using the `manual` option in the `web_agent` configuration where every user input (while the agent is enabled) will instead be passed to the buffer agent using the `query_gen` prompt.
 
 The configurations default options are what I have tested to work best, but user's have the freedom to customize and test these options with any accepted value.
 
