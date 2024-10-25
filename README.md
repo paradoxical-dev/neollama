@@ -48,8 +48,8 @@ To install neollama, simply use your prefferred package manager. For example, us
 ## Configuration
 
 <details>
-  <summary>**Default options:**</summary>
-```lua
+  <summary>Default options:</summary>
+  ```lua
 {
   autoscroll = true,
   hide_cursor = true, -- Decides if cursor will be hidden in menu windows
@@ -159,7 +159,7 @@ To install neollama, simply use your prefferred package manager. For example, us
     change_config = "<leader>cs",
   },
 }
-```
+  ```
 </details>
 
 <details>
