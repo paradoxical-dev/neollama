@@ -1,7 +1,7 @@
 # neollama
 A UI meant for interacting with Ollama models from within Neovim.
 
-(main image or showcase video here)
+![Preview](/preview.jpg)
 
 ## Features
 - Model switching with chat retention
