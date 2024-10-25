@@ -256,7 +256,8 @@ The configurations default options are what I have tested to work best, but user
 
 ### Schema
 The schema can best be visualized using a flow chart:
-(flow chart)
+
+![Schema flow chart](/schema.png)
 
 For a better understanding of how the agent works under the hood, a good video can be found [here](https://www.youtube.com/watch?v=ZE6t9trCRnw). It is the video I used to better grasp the concept and take inspiration from to create a lua solution.
 
