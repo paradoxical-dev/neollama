@@ -24,7 +24,7 @@ M.config = {
 	},
 	web_agent = {
 		enabled = true,
-		manual = true,
+		manual = false,
 		include_sources = true,
 		include_queries = true,
 		spinner_hl = { link = "Comment" },

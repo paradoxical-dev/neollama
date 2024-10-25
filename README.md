@@ -39,11 +39,10 @@ To install neollama, simply use your prefferred package manager. For example, us
     vim.api.nvim_set_keymap("v","<leader>c",'<cmd>lua require("neollama").initialize()<CR>',{ noremap = true, silent = true })
   end)
 }
-
 ```
 
 ## Configuration
-Default options:
+**Default options:**
 ```lua
 {
 	autoscroll = true,
@@ -82,7 +81,7 @@ Default options:
 	},
 	web_agent = { -- See `Web Agent` section for more details
 		enabled = true,
-		manual = true,
+		manual = false,
 		include_sources = true, -- Append sources or queries to chat response
 		include_queries = true,
 		spinner_hl = { link = "Comment" },
@@ -133,7 +132,7 @@ Default options:
 		},
 		input = {
 			icon = ">",
-			hl = { link = "Comment"},
+			hl = { link = "Comment"}, -- Controls the highlight given to the user input in the main chat window
 		},
 		model_picker = {
 			icon = "",
@@ -156,25 +155,54 @@ Default options:
 }
 ```
 
-Example configuration:
+**Example configuration:**
+```lua
+{
+  params = {
+    model = "llama3.1:latest",
+    stream = true,
+  },
+  web_agent = {
+    agent_models = {
+      use_current = false,
+      buffer_agent = { model = "qwen2.5:3b" },
+      reviewing_agent = { model = "qwen2.5:3b", options = { num_ctx = 4096 } },
+			-- You can set any agent to use the current model using this global
+			-- Any params applied to this agent will not be applied to the sessions current model
+      integration_agent = { model = _G.NeollamaModel, options = { temperature = 0.5 } }
+    },
+  },
+  layout = {
+    border = {
+      default = "double",
+    },
+    input = {
+      hl = { fg = "#C9C7CD", bold = true, italic = true },
+    },
+  },
+}
+```
+> NOTE
+> 
+> Any helper agent which is set will not have the default options applied and will have to be explicitly set
 
 ## Usage
 
 ### Input Commands
 Neollama offers three input commands for quick access to certain functionalities:
 
-#### /s
+### /s
 
 Using `/s` from the input window you are able to save the current session. Saving the session saves all aspects of the current session including the current model with set parameters and the current chat history. If ypu attempt to save a chat and the `max_xhats` limit has been reached, you'll be prompted to overwrite an existing session which will then be lost.
->**NOTE**
+> NOTE
 >
->All sessions are saved in the neollama data directory `~/.local/share/nvim/neollama/` in the `chats.lua` file. While these are stored as lua tables, their names are not bound to typical naming conventions.
+> All sessions are saved in the neollama data directory `~/.local/share/nvim/neollama/` in the `chats.lua` file. While these are stored as lua tables, their names are not bound to typical naming conventions.
 >
->Additionally, it is not possible to set the max_chats to a lower value than the number of saved sessions, since there is no manual deletion.
+> Additionally, it is not possible to set the max_chats to a lower value than the number of saved sessions, since there is no manual deletion.
 
 **`/c`**
 
-The `/c` command allows you to enter the config editor for on-the-fly tuning of model parameters. See Config Editor section for more details.
+The `/c` command allows you to enter the config editor for on-the-fly tuning of model parameters. See [Config Editor](#config-editor) section for more details.
 
 **`/w`**
 
