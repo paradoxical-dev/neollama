@@ -29,7 +29,7 @@ sudo luarocks --lua-version=5.1 install gumbo
 To install neollama, simply use your prefferred package manager. For example, using Lazy:
 ```lua
 {
-  "jaredonnell/neollama",
+  "paradoxical-dev/neollama",
   dependencies = {
     "MunifTanjim/nui.nvim",
     "nvim-lua/plenary.nvim",
@@ -278,6 +278,10 @@ Used with two main goals:
 Generates the output for the user, using the compiled information. 
 
 It's response will be treated the same as the standard model call and will be appended to the current sessions chat history.
+
+> [!TIP]
+>
+> The most recent web search and agent responses can be found in the data directory mentioned earlier under web_agent.txt
 
 ## Customization
 Each helper agent is completely customizeable; from the model used to the options applied to them.
