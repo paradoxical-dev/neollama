@@ -1,9 +1,9 @@
- ![Logo](https://imgur.com/6UQxuRw)
+ ![Logo](https://i.imgur.com/6UQxuRw.png)
 
 # neollama
 A UI meant for interacting with Ollama models from within Neovim.
 
-![Preview](https://imgur.com/fcsvw4r)
+![Preview](https://i.imgur.com/fcsvw4r.png)
 
 # Features
 - Model switching with chat retention
@@ -244,7 +244,7 @@ The config editor opens an interactive popup window which displays the set optio
 
 if no value is set for an option and the model has no default value, then the plugins default will be used. 
 
-![Config Editor example](https://imgur.com/p0LiMAD)
+![Config Editor example](https://i.imgur.com/p0LiMAD.png)
 
 To change a value, simply replace it's current value with the desired one. When finished editing, use the change_config command set in the configuration and the new options will be applied.
 
@@ -299,7 +299,7 @@ The configurations default options are what I have tested to work best, but user
 ## Schema
 The schema is best visualized using a flow chart:
 
-![Schema flow chart](https://imgur.com/fNMKG88)
+![Schema flow chart](https://i.imgur.com/fNMKG88.png)
 
 For a better understanding of how the agent works under the hood, a good video can be found [here](https://www.youtube.com/watch?v=ZE6t9trCRnw).
 
