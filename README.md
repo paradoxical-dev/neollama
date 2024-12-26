@@ -24,7 +24,8 @@ To install the `gumbo` module you can use luarocks:
 # Ensure you install for lua 5.1 (neovims current version)
 sudo luarocks --lua-version=5.1 install gumbo
 ```
-> [!WARN]
+> [!WARNING]
+> 
 > There is an issue when using the nui dependency which requires you to be on the **main** branch of the repository.
 >
 > This will be changed if you update all plugins and result in an error message when opening the neollama interface
