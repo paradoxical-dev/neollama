@@ -24,6 +24,12 @@ To install the `gumbo` module you can use luarocks:
 # Ensure you install for lua 5.1 (neovims current version)
 sudo luarocks --lua-version=5.1 install gumbo
 ```
+> [!WARN]
+> There is an issue when using the nui dependency which requires you to be on the **main** branch of the repository.
+>
+> This will be changed if you update all plugins and result in an error message when opening the neollama interface
+>
+> To fix this simply `cd` to the location of the installed nui plugin (typically `.local/share/nvim/...` and use `git checkout main`
 
 # Installation
 To install neollama, simply use your prefferred package manager. For example, using Lazy:
