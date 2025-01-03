@@ -352,7 +352,7 @@ M.popup = function()
 			readonly = false,
 		},
 		win_options = {
-			winhighlight = "Normal:Normal,FloatBorder:NeollamaDefaultBorder",
+			winhighlight = "Normal:NormalFloat,FloatBorder:NeollamaDefaultBorder",
 		},
 	})
 	return self
@@ -390,7 +390,7 @@ M.overwrite_menu = function()
 			height = 5,
 		},
 		win_options = {
-			winhighlight = "Normal:Normal,FloatBorder:NeollamaDefaultBorder",
+			winhighlight = "Normal:NormalFloat,FloatBorder:NeollamaDefaultBorder",
 		},
 	}, {
 		lines = opts,
@@ -453,7 +453,7 @@ M.session_picker = function()
 			padding = { 1, 1 },
 		},
 		win_options = {
-			winhighlight = "Normal:Normal,FloatBorder:NeollamaDefaultBorder",
+			winhighlight = "Normal:NormalFloat,FloatBorder:NeollamaDefaultBorder",
 		},
 	}, {
 		lines = opts,
@@ -538,7 +538,7 @@ M.session_picker = function()
 					)
 				else
 					new_session =
-							item.text:gsub("^[%s%p" .. plugin.config.layout.session_picker.current_icon .. "]*(%a)", "%1")
+						item.text:gsub("^[%s%p" .. plugin.config.layout.session_picker.current_icon .. "]*(%a)", "%1")
 				end
 
 				print("Loading  session: " .. new_session)
@@ -600,7 +600,7 @@ M.model_picker = function()
 			padding = { 1, 1 },
 		},
 		win_options = {
-			winhighlight = "Normal:Normal,FloatBorder:NeollamaDefaultBorder",
+			winhighlight = "Normal:NormalFloat,FloatBorder:NeollamaDefaultBorder",
 		},
 	}, {
 		lines = model_list,
@@ -640,7 +640,7 @@ M.model_picker = function()
 		on_submit = function(item)
 			vim.schedule(function()
 				_G.NeollamaModel = current_selection
-						or item.text:gsub("^[%s%p" .. plugin.config.layout.model_picker.icon .. "]*(%a)", "%1")
+					or item.text:gsub("^[%s%p" .. plugin.config.layout.model_picker.icon .. "]*(%a)", "%1")
 				API.params.model = _G.NeollamaModel
 				API.reset_opts()
 
@@ -689,7 +689,7 @@ M.param_viewer = function()
 			readonly = false,
 		},
 		win_options = {
-			winhighlight = "Normal:Normal,FloatBorder:NeollamaDefaultBorder",
+			winhighlight = "Normal:NormalFloat,FloatBorder:NeollamaDefaultBorder",
 		},
 	})
 	return self

@@ -144,7 +144,7 @@ M.new = function()
 			},
 		},
 		win_options = {
-			winhighlight = "Normal:Normal,FloatBorder:NeollamaDefaultBorder",
+			winhighlight = "Normal:NormalFloat,FloatBorder:NeollamaDefaultBorder",
 		},
 	}, {
 		prompt = plugin.config.layout.input.icon .. " ",
@@ -177,8 +177,8 @@ M.new = function()
 			if plugin.mode ~= false then
 				API.params.messages[#API.params.messages].mode = true
 				API.params.messages[#API.params.messages].content = API.params.messages[#API.params.messages].content
-						.. "\n"
-						.. plugin.mode
+					.. "\n"
+					.. plugin.mode
 				plugin.mode = false
 			end
 
@@ -276,7 +276,7 @@ M.save_prompt = function(user_data, replacement)
 			},
 		},
 		win_options = {
-			winhighlight = "Normal:Normal,FloatBorder:NeollamaDefaultBorder",
+			winhighlight = "Normal:NormalFloat,FloatBorder:NeollamaDefaultBorder",
 		},
 	}, {
 		prompt = "> ",
