@@ -1,4 +1,4 @@
- ![Logo](https://i.imgur.com/anUqevI.png)
+ ![Logo](https://i.imgur.com/kFkBQpJ.png)
 
 # neollama
 A UI meant for interacting with Ollama models from within Neovim.
